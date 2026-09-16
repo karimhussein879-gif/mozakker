@@ -510,6 +510,13 @@ a { color: var(--primary); text-decoration:none; }
 .row { display:flex; gap:8px; align-items:center; }
 .grow { flex:1; }
 </style>
+  <!-- PWA -->
+<link rel="manifest" href="manifest.json">
+<meta name="theme-color" content="#4a6cf7">
+<meta name="apple-mobile-web-app-capable" content="yes">
+<meta name="apple-mobile-web-app-status-bar-style" content="default">
+<meta name="apple-mobile-web-app-title" content="مُذكّر">
+<link rel="apple-touch-icon" href="apple-touch-icon.png">
 </head>
 <body>
 
@@ -1304,6 +1311,15 @@ function init() {
   console.log('%c📝 Mozakker Ready', 'color:#4a6cf7;font-weight:bold;font-size:14px');
 }
 init();
+</script>
+  <script>
+if ('serviceWorker' in navigator) {
+  window.addEventListener('load', () => {
+    navigator.serviceWorker.register('service-worker.js')
+      .then(() => console.log('✅ PWA شغال'))
+      .catch(err => console.log('❌ خطأ:', err));
+  });
+}
 </script>
 </body>
 </html>
