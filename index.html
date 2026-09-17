@@ -31,6 +31,12 @@
   --success: #10b981;
   --font-size: 15px;
   --wallpaper: none;
+  --cat-work: #3b82f6;
+  --cat-personal: #8b5cf6;
+  --cat-ideas: #10b981;
+  --cat-study: #f59e0b;
+  --cat-shopping: #ec4899;
+  --cat-other: #6b7280;
 }
 [data-theme="dark"] {
   --bg: #0f1220;
@@ -163,28 +169,40 @@ a { color: var(--primary); text-decoration:none; }
   border-radius: var(--radius);
   padding: 14px;
   box-shadow: var(--shadow);
-  border-right: 4px solid var(--success);
   transition: transform 0.15s, box-shadow 0.15s;
   position:relative;
   cursor:pointer;
   display:flex; flex-direction:column;
   min-height: 100px;
+  overflow:hidden;
 }
+.note-card::before {
+  content:'';
+  position:absolute; top:0; right:0; left:0;
+  height:4px;
+  background: var(--success);
+}
+.note-card[data-importance="high"]::before { background: var(--danger); }
+.note-card[data-importance="medium"]::before { background: var(--warning); }
+.note-card[data-importance="low"]::before { background: var(--success); }
+.note-card[data-category="work"]::before { background: var(--cat-work); }
+.note-card[data-category="personal"]::before { background: var(--cat-personal); }
+.note-card[data-category="ideas"]::before { background: var(--cat-ideas); }
+.note-card[data-category="study"]::before { background: var(--cat-study); }
+.note-card[data-category="shopping"]::before { background: var(--cat-shopping); }
+.note-card[data-category="other"]::before { background: var(--cat-other); }
 .note-card:hover {
   transform: translateY(-3px);
   box-shadow: var(--shadow-lg);
 }
-.note-card[data-importance="high"] { border-right-color: var(--danger); }
-.note-card[data-importance="medium"] { border-right-color: var(--warning); }
-.note-card[data-importance="low"] { border-right-color: var(--success); }
-.note-card.pinned::before {
-  content:'📌'; position:absolute; top:6px; left:8px;
+.note-card.pinned::after {
+  content:'📌'; position:absolute; top:10px; left:8px;
   font-size:14px;
 }
 .note-card h3 {
   font-size:15px; margin-bottom:6px;
   overflow:hidden; text-overflow:ellipsis;
-  white-space:nowrap; padding-left:20px;
+  white-space:nowrap; padding-left:20px; padding-top:4px;
 }
 .note-card .preview {
   font-size:13px; color: var(--text-muted);
@@ -215,6 +233,32 @@ a { color: var(--primary); text-decoration:none; }
   font-size:12px;
 }
 .note-card .actions button:hover { background: var(--primary); color:#fff; }
+
+.todo-preview {
+  display:flex; align-items:center; gap:6px;
+  margin:3px 0; font-size:13px;
+  cursor:pointer; padding:2px 4px; border-radius:4px;
+  transition: background 0.15s;
+}
+.todo-preview:hover { background: var(--surface-2); }
+.todo-preview .checkbox {
+  display:inline-flex; align-items:center; justify-content:center;
+  width:16px; height:16px; border-radius:4px;
+  border:2px solid var(--border);
+  color:#fff; font-size:10px; flex-shrink:0;
+  transition: all 0.15s;
+}
+.todo-preview.checked .checkbox {
+  border-color: var(--success);
+  background: var(--success);
+}
+.todo-preview.checked .todo-text {
+  text-decoration: line-through;
+  opacity: 0.6;
+}
+.todo-preview .todo-text {
+  overflow:hidden; text-overflow:ellipsis; white-space:nowrap;
+}
 
 .empty {
   text-align:center; padding: 60px 20px;
@@ -332,6 +376,25 @@ a { color: var(--primary); text-decoration:none; }
 .importance-btn[data-value="high"].active { background: #fee2e2; border-color: var(--danger); color: var(--danger); }
 .importance-btn[data-value="medium"].active { background: #ffedd5; border-color: var(--warning); color: #c2410c; }
 .importance-btn[data-value="low"].active { background: #d1fae5; border-color: var(--success); color: #047857; }
+
+.category-row { display:flex; gap:6px; flex-wrap:wrap; }
+.category-btn {
+  padding:8px 14px;
+  border-radius: 999px;
+  background: var(--surface-2);
+  border: 2px solid transparent;
+  font-size:12px; font-weight:600;
+  display:flex; align-items:center; gap:4px;
+  transition: all 0.15s;
+  cursor:pointer;
+}
+.category-btn.active { color:#fff; }
+.category-btn[data-value="work"].active { background: var(--cat-work); border-color: var(--cat-work); }
+.category-btn[data-value="personal"].active { background: var(--cat-personal); border-color: var(--cat-personal); }
+.category-btn[data-value="ideas"].active { background: var(--cat-ideas); border-color: var(--cat-ideas); }
+.category-btn[data-value="study"].active { background: var(--cat-study); border-color: var(--cat-study); }
+.category-btn[data-value="shopping"].active { background: var(--cat-shopping); border-color: var(--cat-shopping); }
+.category-btn[data-value="other"].active { background: var(--cat-other); border-color: var(--cat-other); }
 
 .cal-header {
   display:flex; justify-content:space-between; align-items:center;
@@ -492,6 +555,24 @@ a { color: var(--primary); text-decoration:none; }
 .stat-card .num { font-size:26px; font-weight:800; color: var(--primary); }
 .stat-card .lbl { font-size:12px; color: var(--text-muted); margin-top:4px; }
 
+body.reading-mode {
+  background: #f4ecd8 !important;
+  color: #4a3f2e !important;
+  font-size: 18px !important;
+}
+body.reading-mode .note-card,
+body.reading-mode .event-item,
+body.reading-mode .reminder-item,
+body.reading-mode .settings-section,
+body.reading-mode .stat-card {
+  background: #faf5e6 !important;
+  color: #4a3f2e !important;
+}
+body.reading-mode .header,
+body.reading-mode .tabs {
+  background: #ede4cc !important;
+}
+
 @media (max-width: 640px) {
   .logo span { display:none; }
   .notes-grid { grid-template-columns: 1fr; }
@@ -526,6 +607,7 @@ a { color: var(--primary); text-decoration:none; }
       <svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2"><circle cx="11" cy="11" r="8"/><path d="m21 21-4.3-4.3"/></svg>
       <input type="text" id="globalSearch" data-i18n-ph="search" placeholder="ابحث في كل حاجة...">
     </div>
+    <button class="icon-btn" id="readingBtn" title="وضع القراءة">📖</button>
     <button class="icon-btn" id="themeToggle" title="Theme">
       <svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2"><path d="M21 12.79A9 9 0 1 1 11.21 3 7 7 0 0 0 21 12.79z"/></svg>
     </button>
@@ -558,7 +640,7 @@ a { color: var(--primary); text-decoration:none; }
 
 <script>
 /* ============================================================
-   مُذكّر | Mozakker - Full Logic
+   مُذكّر | Mozakker - Full Logic v2.0
    ============================================================ */
 
 const I18N = {
@@ -567,6 +649,8 @@ const I18N = {
     reminders: 'التنبيهات', today: 'اليوم', stats: 'إحصائيات', settings: 'الإعدادات',
     addNote: 'ملاحظة جديدة', editNote: 'تعديل الملاحظة', noteTitle: 'العنوان',
     noteBody: 'المحتوى', importance: 'الأهمية', high: 'عالية', medium: 'متوسطة', low: 'منخفضة',
+    category: 'التصنيف', cat_work: 'عمل', cat_personal: 'شخصي', cat_ideas: 'أفكار',
+    cat_study: 'دراسة', cat_shopping: 'تسوق', cat_other: 'أخرى',
     tags: 'الوسوم (افصل بفاصلة)', save: 'حفظ', cancel: 'إلغاء', delete: 'حذف',
     addEvent: 'موعد جديد', editEvent: 'تعديل الموعد', eventTitle: 'عنوان الموعد',
     eventDesc: 'الوصف', startTime: 'وقت البداية', endTime: 'وقت النهاية (اختياري)',
@@ -590,7 +674,8 @@ const I18N = {
     language: 'اللغة', arabic: 'العربية', english: 'English',
     totalNotes: 'إجمالي الملاحظات', totalEvents: 'إجمالي المواعيد', totalReminders: 'إجمالي التنبيهات',
     highImportance: 'عالية الأهمية', thisWeek: 'هذا الأسبوع',
-    pin: 'تثبيت', unpin: 'إلغاء التثبيت', copy: 'نسخ',
+    pin: 'تثبيت', unpin: 'إلغاء التثبيت', copy: 'نسخ', share: 'مشاركة',
+    pdf: 'تصدير PDF', readingMode: 'وضع القراءة',
     noteAdded: 'تمت إضافة الملاحظة', noteUpdated: 'تم تحديث الملاحظة',
     eventAdded: 'تمت إضافة الموعد', eventUpdated: 'تم تحديث الموعد',
     reminderAdded: 'تمت إضافة التنبيه', reminderUpdated: 'تم تحديث التنبيه',
@@ -605,6 +690,8 @@ const I18N = {
     reminders: 'Reminders', today: 'Today', stats: 'Stats', settings: 'Settings',
     addNote: 'New Note', editNote: 'Edit Note', noteTitle: 'Title',
     noteBody: 'Content', importance: 'Importance', high: 'High', medium: 'Medium', low: 'Low',
+    category: 'Category', cat_work: 'Work', cat_personal: 'Personal', cat_ideas: 'Ideas',
+    cat_study: 'Study', cat_shopping: 'Shopping', cat_other: 'Other',
     tags: 'Tags (comma separated)', save: 'Save', cancel: 'Cancel', delete: 'Delete',
     addEvent: 'New Event', editEvent: 'Edit Event', eventTitle: 'Event Title',
     eventDesc: 'Description', startTime: 'Start Time', endTime: 'End Time',
@@ -628,7 +715,8 @@ const I18N = {
     language: 'Language', arabic: 'العربية', english: 'English',
     totalNotes: 'Total Notes', totalEvents: 'Total Events', totalReminders: 'Total Reminders',
     highImportance: 'High Importance', thisWeek: 'This Week',
-    pin: 'Pin', unpin: 'Unpin', copy: 'Copy',
+    pin: 'Pin', unpin: 'Unpin', copy: 'Copy', share: 'Share',
+    pdf: 'Export PDF', readingMode: 'Reading Mode',
     noteAdded: 'Note added', noteUpdated: 'Note updated',
     eventAdded: 'Event added', eventUpdated: 'Event updated',
     reminderAdded: 'Reminder added', reminderUpdated: 'Reminder updated',
@@ -657,7 +745,7 @@ let events = load(DB.events);
 let reminders = load(DB.reminders);
 let settings = load(DB.settings, {
   theme: 'light', primary: '#4a6cf7', bg: '#f5f7fb', text: '#1a1a2e',
-  wallpaper: '', fontSize: 15
+  wallpaper: '', fontSize: 15, readingMode: false
 });
 
 function autoBackup() {
@@ -732,6 +820,12 @@ function applyTheme() {
   root.style.setProperty('--font-size', settings.fontSize + 'px');
   root.style.setProperty('--wallpaper', settings.wallpaper ? `url('${settings.wallpaper}')` : 'none');
   root.style.setProperty('--wallpaper-overlay', settings.wallpaper ? 'block' : 'none');
+  document.body.classList.toggle('reading-mode', settings.readingMode);
+  const rBtn = document.getElementById('readingBtn');
+  if (rBtn) {
+    rBtn.style.background = settings.readingMode ? 'var(--primary)' : '';
+    rBtn.style.color = settings.readingMode ? '#fff' : '';
+  }
 }
 function setThemePreset(name) {
   const presets = {
@@ -757,6 +851,15 @@ let currentDate = new Date();
 let searchQuery = '';
 let editingId = null;
 
+const CATEGORIES = {
+  work: { emoji: '💼', key: 'cat_work', color: '#3b82f6' },
+  personal: { emoji: '🏠', key: 'cat_personal', color: '#8b5cf6' },
+  ideas: { emoji: '💡', key: 'cat_ideas', color: '#10b981' },
+  study: { emoji: '📚', key: 'cat_study', color: '#f59e0b' },
+  shopping: { emoji: '🛒', key: 'cat_shopping', color: '#ec4899' },
+  other: { emoji: '📌', key: 'cat_other', color: '#6b7280' }
+};
+
 function render() {
   const main = document.getElementById('main');
   const q = searchQuery.trim().toLowerCase();
@@ -769,6 +872,56 @@ function render() {
   else if (currentTab === 'today') main.innerHTML = renderToday();
   else if (currentTab === 'stats') main.innerHTML = renderStats();
   document.querySelectorAll('.tab').forEach(tb => tb.classList.toggle('active', tb.dataset.tab === currentTab));
+}
+
+function renderNotePreview(note) {
+  if (!note || !note.body) return '';
+  const lines = note.body.split('\n');
+  const hasTodos = lines.some(line => {
+    const t = line.trim();
+    return t.startsWith('- [ ]') || t.startsWith('- [x]') || t.startsWith('- [X]');
+  });
+  if (!hasTodos) return escapeHtml(note.body.slice(0, 150));
+  let html = '';
+  let shown = 0;
+  lines.forEach((line, idx) => {
+    if (shown >= 6) return;
+    const trimmed = line.trim();
+    const isUnchecked = trimmed.startsWith('- [ ]');
+    const isChecked = trimmed.startsWith('- [x]') || trimmed.startsWith('- [X]');
+    if (isUnchecked || isChecked) {
+      const text = trimmed.replace(/^- \[[ xX]\]\s*/, '');
+      const checked = isChecked;
+      html += '<div class="todo-preview ' + (checked ? 'checked' : '') + '" onclick="event.stopPropagation();toggleTodo(\'' + note.id + '\',' + idx + ')">'
+        + '<span class="checkbox">' + (checked ? '✓' : '') + '</span>'
+        + '<span class="todo-text">' + escapeHtml(text) + '</span>'
+        + '</div>';
+      shown++;
+    } else if (trimmed) {
+      html += '<div style="font-size:12px;color:var(--text-muted);margin:2px 0;overflow:hidden;text-overflow:ellipsis;white-space:nowrap">' + escapeHtml(line) + '</div>';
+    }
+  });
+  if (lines.length > 6) html += '<div style="font-size:11px;color:var(--text-muted);margin-top:4px">...</div>';
+  return html;
+}
+
+function toggleTodo(noteId, lineIndex) {
+  const note = notes.find(n => n.id === noteId);
+  if (!note || !note.body) return;
+  const lines = note.body.split('\n');
+  const line = lines[lineIndex];
+  if (line === undefined) return;
+  const trimmed = line.trim();
+  if (trimmed.startsWith('- [ ]')) {
+    lines[lineIndex] = line.replace('- [ ]', '- [x]');
+  } else if (trimmed.startsWith('- [x]') || trimmed.startsWith('- [X]')) {
+    lines[lineIndex] = line.replace(/- \[[xX]\]/, '- [ ]');
+  } else return;
+  note.body = lines.join('\n');
+  note.updated = Date.now();
+  save(DB.notes, notes);
+  beep(600, 0.05);
+  render();
 }
 
 function renderNotes(q) {
@@ -784,15 +937,18 @@ function renderNotes(q) {
   }
   return `<div class="notes-grid">${list.map(n => {
     const tags = (n.tags || []).map(tg => `<span class="tag">#${escapeHtml(tg)}</span>`).join('');
-    return `<div class="note-card ${n.pinned?'pinned':''}" data-importance="${n.importance || 'low'}" onclick="editNote('${n.id}')">
+    const cat = n.category || 'other';
+    return `<div class="note-card ${n.pinned?'pinned':''}" data-importance="${n.importance || 'low'}" data-category="${cat}" onclick="editNote('${n.id}')">
       <h3>${escapeHtml(n.title || '(بدون عنوان)')}</h3>
-      <div class="preview">${escapeHtml((n.body || '').slice(0, 150))}</div>
+      <div class="preview">${renderNotePreview(n)}</div>
       <div class="meta">
         <div class="tags">${tags}</div>
         <div class="actions" onclick="event.stopPropagation()">
-          <button onclick="togglePin('${n.id}')">${n.pinned?'📌':'📍'}</button>
-          <button onclick="copyNote('${n.id}')">📋</button>
-          <button onclick="deleteNote('${n.id}')">🗑️</button>
+          <button onclick="togglePin('${n.id}')" title="${n.pinned?t('unpin'):t('pin')}">${n.pinned?'📌':'📍'}</button>
+          <button onclick="copyNote('${n.id}')" title="${t('copy')}">📋</button>
+          <button onclick="shareNote('${n.id}')" title="${t('share')}">📤</button>
+          <button onclick="exportNoteAsPDF('${n.id}')" title="${t('pdf')}">📄</button>
+          <button onclick="deleteNote('${n.id}')" title="${t('delete')}">🗑️</button>
         </div>
       </div>
     </div>`;
@@ -877,7 +1033,7 @@ function renderToday() {
   else html += todayReminders.map(r => `<div class="reminder-item"><div class="reminder-icon">🔔</div><div class="reminder-info"><h4>${escapeHtml(r.title)}</h4><p>${r.time}</p></div></div>`).join('');
   html += `<h3 class="mt-2 mb-1" style="font-size:15px">⭐ ${t('todayNotes')}</h3>`;
   if (importantNotes.length === 0) html += `<div class="empty" style="padding:20px"><p>${t('noToday')}</p></div>`;
-  else html += `<div class="notes-grid">${importantNotes.map(n => `<div class="note-card ${n.pinned?'pinned':''}" data-importance="${n.importance || 'low'}" onclick="editNote('${n.id}')"><h3>${escapeHtml(n.title || '(بدون عنوان)')}</h3><div class="preview">${escapeHtml((n.body||'').slice(0,80))}</div></div>`).join('')}</div>`;
+  else html += `<div class="notes-grid">${importantNotes.map(n => `<div class="note-card ${n.pinned?'pinned':''}" data-importance="${n.importance || 'low'}" data-category="${n.category || 'other'}" onclick="editNote('${n.id}')"><h3>${escapeHtml(n.title || '(بدون عنوان)')}</h3><div class="preview">${escapeHtml((n.body||'').slice(0,80))}</div></div>`).join('')}</div>`;
   return html;
 }
 
@@ -909,12 +1065,16 @@ function renderStats() {
 
 function openNoteModal(id) {
   editingId = id || null;
-  const n = id ? notes.find(x => x.id === id) : { title:'', body:'', importance:'low', tags:[], pinned:false };
+  const n = id ? notes.find(x => x.id === id) : { title:'', body:'', importance:'low', tags:[], pinned:false, category:'other' };
+  const catBtns = Object.keys(CATEGORIES).map(k => {
+    const c = CATEGORIES[k];
+    return `<button type="button" class="category-btn" data-value="${k}" onclick="setCategory('${k}')">${c.emoji} ${t(c.key)}</button>`;
+  }).join('');
   document.getElementById('modalBox').innerHTML = `
     <div class="modal-header"><h2>${id ? t('editNote') : t('addNote')}</h2><button class="close-x" onclick="closeModal()">✕</button></div>
     <div class="modal-body">
       <div class="form-group"><label>${t('noteTitle')}</label><input type="text" id="noteTitle" value="${escapeHtml(n.title)}"></div>
-      <div class="form-group"><label>${t('noteBody')}</label><textarea id="noteBody">${escapeHtml(n.body)}</textarea></div>
+      <div class="form-group"><label>${t('noteBody')}</label><textarea id="noteBody">${escapeHtml(n.body)}</textarea><div style="font-size:11px;color:var(--text-muted);margin-top:4px">💡 اكتب "- [ ] " في بداية السطر لعمل قائمة مهام</div></div>
       <div class="form-group"><label>${t('importance')}</label>
         <div class="importance-row">
           <button type="button" class="importance-btn" data-value="high" onclick="setImportance('high')">🔴 ${t('high')}</button>
@@ -922,10 +1082,14 @@ function openNoteModal(id) {
           <button type="button" class="importance-btn" data-value="low" onclick="setImportance('low')">🟢 ${t('low')}</button>
         </div>
       </div>
+      <div class="form-group"><label>${t('category')}</label>
+        <div class="category-row">${catBtns}</div>
+      </div>
       <div class="form-group"><label>${t('tags')}</label><input type="text" id="noteTags" value="${escapeHtml((n.tags || []).join(', '))}"></div>
     </div>
     <div class="modal-footer"><button class="btn ghost" onclick="closeModal()">${t('cancel')}</button><button class="btn primary" onclick="saveNote()">${t('save')}</button></div>`;
   setImportance(n.importance || 'low');
+  setCategory(n.category || 'other');
   showModal();
 }
 function setImportance(v) {
@@ -935,18 +1099,26 @@ function getImportance() {
   const btn = document.querySelector('.importance-btn.active');
   return btn ? btn.dataset.value : 'low';
 }
+function setCategory(v) {
+  document.querySelectorAll('.category-btn').forEach(b => b.classList.toggle('active', b.dataset.value === v));
+}
+function getCategory() {
+  const btn = document.querySelector('.category-btn.active');
+  return btn ? btn.dataset.value : 'other';
+}
 function saveNote() {
   const title = document.getElementById('noteTitle').value.trim();
   const body = document.getElementById('noteBody').value.trim();
   const importance = getImportance();
+  const category = getCategory();
   const tags = document.getElementById('noteTags').value.split(',').map(s => s.trim()).filter(Boolean);
   if (!title && !body) { toast('اكتب حاجة الأول', 'error'); return; }
   if (editingId) {
     const n = notes.find(x => x.id === editingId);
-    Object.assign(n, { title, body, importance, tags, updated: Date.now() });
+    Object.assign(n, { title, body, importance, category, tags, updated: Date.now() });
     toast(t('noteUpdated'), 'success');
   } else {
-    notes.push({ id: uid(), title, body, importance, tags, pinned: false, created: Date.now(), updated: Date.now() });
+    notes.push({ id: uid(), title, body, importance, category, tags, pinned: false, created: Date.now(), updated: Date.now() });
     toast(t('noteAdded'), 'success');
   }
   save(DB.notes, notes);
@@ -974,6 +1146,39 @@ function togglePin(id) {
 function copyNote(id) {
   const n = notes.find(x => x.id === id);
   navigator.clipboard.writeText(`${n.title}\n\n${n.body}`).then(() => toast(t('copied'), 'success'));
+}
+function shareNote(id) {
+  const n = notes.find(x => x.id === id);
+  const text = `📝 ${n.title || ''}\n\n${n.body || ''}`;
+  if (navigator.share) {
+    navigator.share({ title: n.title || 'ملاحظة', text }).then(() => beep(800, 0.08)).catch(() => {});
+  } else {
+    navigator.clipboard.writeText(text).then(() => { toast(t('copied'), 'success'); beep(800, 0.08); });
+  }
+}
+function exportNoteAsPDF(id) {
+  const n = notes.find(x => x.id === id);
+  if (!n) return;
+  const cat = CATEGORIES[n.category] || CATEGORIES.other;
+  const imp = n.importance === 'high' ? '🔴 عالية الأهمية' : n.importance === 'medium' ? '🟠 متوسطة' : '🟢 منخفضة';
+  const html = '<!DOCTYPE html><html dir="rtl" lang="ar"><head><meta charset="UTF-8"><title>' + (n.title || 'ملاحظة') + '</title>'
+    + '<style>body { font-family: Arial, sans-serif; padding: 40px; line-height: 1.8; color: #333; }'
+    + 'h1 { color: #4a6cf7; border-bottom: 3px solid #4a6cf7; padding-bottom: 10px; }'
+    + '.meta { color: #888; font-size: 12px; margin-bottom: 20px; }'
+    + '.body { white-space: pre-wrap; font-size: 15px; }'
+    + '.tag { background: #eee; padding: 3px 10px; border-radius: 12px; margin: 3px; display: inline-block; font-size: 12px; }'
+    + '</style></head><body>'
+    + '<h1>' + escapeHtml(n.title || '(بدون عنوان)') + '</h1>'
+    + '<div class="meta">' + cat.emoji + ' ' + t(cat.key) + ' • ' + imp + ' • ' + new Date(n.updated || Date.now()).toLocaleDateString('ar-EG') + '</div>'
+    + '<div class="body">' + escapeHtml(n.body || '') + '</div>'
+    + (n.tags && n.tags.length ? '<div>' + n.tags.map(tg => '<span class="tag">#' + escapeHtml(tg) + '</span>').join('') + '</div>' : '')
+    + '<hr style="margin-top:40px;border:none;border-top:1px solid #ddd">'
+    + '<p style="text-align:center;color:#aaa;font-size:12px">من تطبيق مُذكّر</p></body></html>';
+  const win = window.open('', '_blank');
+  win.document.write(html);
+  win.document.close();
+  setTimeout(() => { win.print(); }, 500);
+  beep(900, 0.1);
 }
 
 function openEventModal(id) {
@@ -1187,7 +1392,7 @@ function setLang(lang) {
 }
 
 function exportData() {
-  const data = { notes, events, reminders, settings, exported: new Date().toISOString(), version: 1 };
+  const data = { notes, events, reminders, settings, exported: new Date().toISOString(), version: 2 };
   const blob = new Blob([JSON.stringify(data, null, 2)], { type: 'application/json' });
   const url = URL.createObjectURL(blob);
   const a = document.createElement('a');
@@ -1254,6 +1459,14 @@ document.getElementById('themeToggle').addEventListener('click', () => {
   beep(700, 0.08);
 });
 
+document.getElementById('readingBtn').addEventListener('click', () => {
+  settings.readingMode = !settings.readingMode;
+  save(DB.settings, settings);
+  applyTheme();
+  beep(settings.readingMode ? 800 : 400, 0.08);
+  toast(settings.readingMode ? '📖 وضع القراءة' : '☀️ الوضع العادي', 'success');
+});
+
 document.addEventListener('keydown', e => {
   if (e.ctrlKey || e.metaKey) {
     if (e.key === 'n') { e.preventDefault(); openNoteModal(); }
@@ -1307,7 +1520,7 @@ function init() {
   applyTheme();
   autoBackup();
   render();
-  console.log('%c📝 Mozakker Ready', 'color:#4a6cf7;font-weight:bold;font-size:14px');
+  console.log('%c📝 Mozakker Ready v2.0', 'color:#4a6cf7;font-weight:bold;font-size:14px');
 }
 init();
 </script>
