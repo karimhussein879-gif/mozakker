@@ -795,6 +795,7 @@ function renderNotes(q) {
           <button onclick="togglePin('${n.id}')">${n.pinned?'📌':'📍'}</button>
           <button onclick="copyNote('${n.id}')">📋</button>
           <button onclick="shareNote('${n.id}')">📤</button>
+          <button onclick="exportNoteAsPDF('${n.id}')">📄</button>
           <button onclick="deleteNote('${n.id}')">🗑️</button>
         </div>
       </div>
