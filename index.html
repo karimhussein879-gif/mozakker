@@ -788,7 +788,7 @@ function renderNotes(q) {
     const tags = (n.tags || []).map(tg => `<span class="tag">#${escapeHtml(tg)}</span>`).join('');
     return `<div class="note-card ${n.pinned?'pinned':''}" data-importance="${n.importance || 'low'}" onclick="editNote('${n.id}')">
       <h3>${escapeHtml(n.title || '(بدون عنوان)')}</h3>
-      <div class="preview">${renderNotePreview(n)}</div>
+      <div class="preview">${(typeof renderNotePreview === 'function') ? renderNotePreview(n) : escapeHtml((n.body || '').slice(0, 150))}</div>
       <div class="meta">
         <div class="tags">${tags}</div>
         <div class="actions" onclick="event.stopPropagation()">
