@@ -376,5 +376,39 @@
       console.log('✅ 10 مميزات جديدة شغالة');
     }, 1000);
   });
+// ==================== To-Do Renderer ====================
+window.renderNotePreview = function(note) {
+  if (!note || !note.body) return '';
 
+  const lines = note.body.split('\n');
+  const hasTodos = lines.some(line => line.trim().startsWith('- [ ]') || line.trim().startsWith('- [x]'));
+
+  if (!hasTodos) {
+    return escapeHtml(note.body.slice(0, 150));
+  }
+
+  let html = '';
+  lines.slice(0, 8).forEach(line => {
+    const trimmed = line.trim();
+    const isUnchecked = trimmed.startsWith('- [ ]');
+    const isChecked = trimmed.startsWith('- [x]') || trimmed.startsWith('- [X]');
+
+    if (isUnchecked || isChecked) {
+      const text = trimmed.replace(/^- \[[ xX]\]\s*/, '');
+      const checked = isChecked;
+      html += '<div style="display:flex;align-items:center;gap:6px;margin:3px 0;font-size:13px">'
+        + '<span style="display:inline-flex;align-items:center;justify-content:center;width:16px;height:16px;border-radius:4px;border:2px solid ' + (checked ? 'var(--success)' : 'var(--border)') + ';background:' + (checked ? 'var(--success)' : 'transparent') + ';color:#fff;font-size:10px;flex-shrink:0">' + (checked ? '✓' : '') + '</span>'
+        + '<span style="' + (checked ? 'text-decoration:line-through;opacity:0.6;' : '') + 'overflow:hidden;text-overflow:ellipsis;white-space:nowrap">' + escapeHtml(text) + '</span>'
+        + '</div>';
+    } else if (line.trim()) {
+      html += '<div style="font-size:12px;color:var(--text-muted);margin:2px 0;overflow:hidden;text-overflow:ellipsis;white-space:nowrap">' + escapeHtml(line) + '</div>';
+    }
+  });
+
+  if (lines.length > 8) {
+    html += '<div style="font-size:11px;color:var(--text-muted);margin-top:4px">...</div>';
+  }
+
+  return html;
+};
 })();
