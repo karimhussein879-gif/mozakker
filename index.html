@@ -794,6 +794,7 @@ function renderNotes(q) {
         <div class="actions" onclick="event.stopPropagation()">
           <button onclick="togglePin('${n.id}')">${n.pinned?'📌':'📍'}</button>
           <button onclick="copyNote('${n.id}')">📋</button>
+          <button onclick="shareNote('${n.id}')">📤</button>
           <button onclick="deleteNote('${n.id}')">🗑️</button>
         </div>
       </div>
