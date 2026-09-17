@@ -9,6 +9,7 @@ const CACHE_NAME = `${CACHE_VERSION}-${Date.now()}`;
 const ASSETS = [
   './',
   './index.html',
+   './about.html',
   './manifest.json',
   './features.js',
   './icon-192.png',
