@@ -1,0 +1,656 @@
+<!DOCTYPE html>
+<html lang="ar" dir="rtl">
+<head>
+<meta charset="UTF-8">
+<meta name="viewport" content="width=device-width,initial-scale=1,user-scalable=no">
+<meta name="theme-color" content="#4a6cf7">
+<title>عن مُذكّر | Mozakker</title>
+<link rel="icon" href="data:image/svg+xml,<svg xmlns='http://www.w3.org/2000/svg' viewBox='0 0 100 100'><text y='.9em' font-size='90'>📝</text></svg>">
+<style>
+:root {
+  --primary: #4a6cf7;
+  --primary-dark: #3a56d4;
+  --primary-light: #7c93ff;
+  --bg: #f5f7fb;
+  --surface: #ffffff;
+  --surface-2: #eef1f8;
+  --text: #1a1a2e;
+  --text-muted: #6b7280;
+  --border: #e0e4ee;
+  --shadow: 0 2px 12px rgba(0,0,0,0.06);
+  --shadow-lg: 0 8px 30px rgba(0,0,0,0.12);
+  --radius: 14px;
+  --radius-sm: 8px;
+  --success: #10b981;
+  --whatsapp: #25d366;
+  --telegram: #0088cc;
+  --email: #ea4335;
+}
+[data-theme="dark"] {
+  --bg: #0f1220;
+  --surface: #1a1f33;
+  --surface-2: #252b45;
+  --text: #e8ecf7;
+  --text-muted: #9aa3bd;
+  --border: #2c3350;
+}
+* { margin:0; padding:0; box-sizing:border-box; -webkit-tap-highlight-color:transparent; }
+html { scroll-behavior: smooth; }
+body {
+  width:100%; min-height:100%;
+  font-family: 'Segoe UI', Tahoma, system-ui, sans-serif;
+  background: var(--bg);
+  color: var(--text);
+  font-size: 15px;
+  line-height: 1.7;
+  overflow-x: hidden;
+}
+a { color: var(--primary); text-decoration: none; }
+button { cursor:pointer; border:none; background:none; font-family: inherit; font-size: inherit; }
+::-webkit-scrollbar { width:10px; height:10px; }
+::-webkit-scrollbar-track { background: transparent; }
+::-webkit-scrollbar-thumb { background: var(--border); border-radius:5px; }
+::-webkit-scrollbar-thumb:hover { background: var(--primary); }
+
+/* ========== Header ========== */
+.topbar {
+  background: var(--surface);
+  border-bottom: 1px solid var(--border);
+  padding: 12px 20px;
+  display: flex; align-items: center; justify-content: space-between;
+  position: sticky; top:0; z-index:100;
+  box-shadow: var(--shadow);
+  backdrop-filter: blur(10px);
+}
+.topbar .brand {
+  font-weight: 800; font-size: 18px; color: var(--primary);
+  display: flex; align-items: center; gap: 8px;
+}
+.topbar .actions { display: flex; gap: 8px; }
+.topbar .back-btn {
+  padding: 8px 18px; border-radius: 999px;
+  background: var(--primary); color: #fff;
+  font-weight: 600; font-size: 14px;
+  display: inline-flex; align-items: center; gap: 6px;
+  transition: all 0.2s;
+}
+.topbar .back-btn:hover { background: var(--primary-dark); transform: translateY(-1px); }
+
+/* ========== Hero ========== */
+.hero {
+  background: linear-gradient(135deg, #4a6cf7 0%, #7c3aed 100%);
+  color: #fff;
+  padding: 80px 20px 100px;
+  text-align: center;
+  position: relative;
+  overflow: hidden;
+}
+.hero::before {
+  content: '';
+  position: absolute; top: -50%; right: -50%;
+  width: 200%; height: 200%;
+  background: radial-gradient(circle, rgba(255,255,255,0.1) 0%, transparent 60%);
+  animation: rotate 30s linear infinite;
+}
+@keyframes rotate {
+  from { transform: rotate(0deg); }
+  to { transform: rotate(360deg); }
+}
+.hero-content { position: relative; z-index: 1; max-width: 800px; margin: 0 auto; }
+.hero .app-icon {
+  width: 100px; height: 100px;
+  background: rgba(255,255,255,0.2);
+  border-radius: 24px;
+  display: flex; align-items: center; justify-content: center;
+  font-size: 56px; margin: 0 auto 24px;
+  backdrop-filter: blur(10px);
+  box-shadow: 0 10px 40px rgba(0,0,0,0.2);
+}
+.hero h1 { font-size: 42px; margin-bottom: 12px; font-weight: 800; }
+.hero .tagline { font-size: 18px; opacity: 0.9; margin-bottom: 30px; }
+.hero .cta-btn {
+  display: inline-flex; align-items: center; gap: 10px;
+  background: #fff; color: var(--primary);
+  padding: 14px 32px; border-radius: 999px;
+  font-weight: 700; font-size: 16px;
+  transition: all 0.2s;
+  box-shadow: 0 10px 30px rgba(0,0,0,0.2);
+}
+.hero .cta-btn:hover { transform: translateY(-3px); box-shadow: 0 15px 40px rgba(0,0,0,0.3); }
+.hero .cta-btn:active { transform: translateY(-1px); }
+
+/* ========== Main Content ========== */
+.container {
+  max-width: 900px;
+  margin: -60px auto 0;
+  padding: 0 20px 60px;
+  position: relative;
+  z-index: 2;
+}
+.card {
+  background: var(--surface);
+  border-radius: var(--radius);
+  padding: 32px;
+  margin-bottom: 24px;
+  box-shadow: var(--shadow);
+  border: 1px solid var(--border);
+}
+.card h2 {
+  font-size: 24px;
+  color: var(--primary);
+  margin-bottom: 20px;
+  display: flex; align-items: center; gap: 10px;
+  padding-bottom: 14px;
+  border-bottom: 2px solid var(--border);
+}
+.card h2 .emoji { font-size: 28px; }
+.card h3 {
+  font-size: 17px;
+  color: var(--text);
+  margin: 20px 0 10px;
+  display: flex; align-items: center; gap: 8px;
+}
+.card p { color: var(--text-muted); margin-bottom: 12px; }
+.card ul { list-style: none; padding: 0; }
+.card ul li {
+  padding: 8px 0;
+  padding-right: 28px;
+  position: relative;
+  color: var(--text-muted);
+}
+.card ul li::before {
+  content: '✓';
+  position: absolute; right: 0; top: 8px;
+  color: var(--success);
+  font-weight: bold;
+  font-size: 14px;
+}
+
+/* ========== Features Grid ========== */
+.features-grid {
+  display: grid;
+  grid-template-columns: repeat(auto-fit, minmax(220px, 1fr));
+  gap: 14px;
+  margin-top: 16px;
+}
+.feature-item {
+  background: var(--surface-2);
+  border-radius: var(--radius-sm);
+  padding: 18px;
+  transition: all 0.2s;
+  border: 1px solid transparent;
+}
+.feature-item:hover {
+  transform: translateY(-3px);
+  border-color: var(--primary);
+  box-shadow: var(--shadow);
+}
+.feature-item .icon {
+  width: 44px; height: 44px;
+  background: var(--surface);
+  border-radius: 12px;
+  display: flex; align-items: center; justify-content: center;
+  font-size: 24px;
+  margin-bottom: 12px;
+  box-shadow: var(--shadow);
+}
+.feature-item h4 { font-size: 15px; margin-bottom: 6px; color: var(--text); }
+.feature-item p { font-size: 13px; color: var(--text-muted); margin: 0; line-height: 1.5; }
+
+/* ========== Guide Steps ========== */
+.step {
+  display: flex; gap: 16px;
+  padding: 16px 0;
+  border-bottom: 1px solid var(--border);
+}
+.step:last-child { border-bottom: none; }
+.step .num {
+  width: 36px; height: 36px;
+  background: linear-gradient(135deg, var(--primary), var(--primary-light));
+  color: #fff;
+  border-radius: 50%;
+  display: flex; align-items: center; justify-content: center;
+  font-weight: 700; font-size: 16px;
+  flex-shrink: 0;
+  box-shadow: 0 4px 12px rgba(74,108,247,0.3);
+}
+.step .content { flex: 1; }
+.step .content h4 { font-size: 15px; margin-bottom: 4px; color: var(--text); }
+.step .content p { font-size: 13px; color: var(--text-muted); margin: 0; }
+
+/* ========== FAQ ========== */
+.faq-item {
+  background: var(--surface-2);
+  border-radius: var(--radius-sm);
+  margin-bottom: 10px;
+  overflow: hidden;
+  border: 1px solid transparent;
+  transition: border 0.2s;
+}
+.faq-item:hover { border-color: var(--primary); }
+.faq-q {
+  padding: 16px 20px;
+  font-weight: 600;
+  cursor: pointer;
+  display: flex; justify-content: space-between; align-items: center;
+  gap: 10px;
+  font-size: 14px;
+  color: var(--text);
+}
+.faq-q::after {
+  content: '+';
+  font-size: 22px;
+  color: var(--primary);
+  font-weight: 300;
+  transition: transform 0.2s;
+  flex-shrink: 0;
+}
+.faq-item.open .faq-q::after { transform: rotate(45deg); }
+.faq-a {
+  max-height: 0;
+  overflow: hidden;
+  transition: max-height 0.3s ease, padding 0.3s ease;
+  padding: 0 20px;
+  color: var(--text-muted);
+  font-size: 13.5px;
+  line-height: 1.7;
+}
+.faq-item.open .faq-a {
+  max-height: 500px;
+  padding: 0 20px 18px;
+}
+
+/* ========== Contact ========== */
+.contact-grid {
+  display: grid;
+  grid-template-columns: repeat(auto-fit, minmax(200px, 1fr));
+  gap: 12px;
+  margin-top: 16px;
+}
+.contact-btn {
+  display: flex; align-items: center; gap: 12px;
+  padding: 16px 20px;
+  border-radius: var(--radius-sm);
+  background: var(--surface-2);
+  color: var(--text);
+  transition: all 0.2s;
+  border: 1px solid var(--border);
+  text-decoration: none;
+  font-size: 14px;
+}
+.contact-btn:hover {
+  transform: translateY(-2px);
+  box-shadow: var(--shadow);
+}
+.contact-btn .icon-box {
+  width: 40px; height: 40px;
+  border-radius: 10px;
+  display: flex; align-items: center; justify-content: center;
+  font-size: 22px;
+  flex-shrink: 0;
+  color: #fff;
+}
+.contact-btn.whatsapp .icon-box { background: var(--whatsapp); }
+.contact-btn.telegram .icon-box { background: var(--telegram); }
+.contact-btn.email .icon-box { background: var(--email); }
+.contact-btn .info { flex: 1; min-width: 0; }
+.contact-btn .info .title { font-weight: 600; margin-bottom: 2px; font-size: 14px; }
+.contact-btn .info .value { font-size: 12px; color: var(--text-muted); direction: ltr; text-align: right; overflow: hidden; text-overflow: ellipsis; }
+
+/* ========== License ========== */
+.license-box {
+  background: linear-gradient(135deg, var(--surface-2), var(--surface));
+  border-radius: var(--radius-sm);
+  padding: 24px;
+  text-align: center;
+  border: 2px dashed var(--border);
+}
+.license-box .author {
+  font-size: 22px;
+  font-weight: 800;
+  color: var(--primary);
+  margin-bottom: 6px;
+}
+.license-box .year { font-size: 14px; color: var(--text-muted); margin-bottom: 16px; }
+.license-box .rights { font-size: 13px; color: var(--text-muted); }
+
+/* ========== Footer ========== */
+.footer {
+  background: var(--surface);
+  border-top: 1px solid var(--border);
+  padding: 30px 20px;
+  text-align: center;
+  color: var(--text-muted);
+  font-size: 13px;
+}
+.footer .heart { color: var(--email); }
+
+/* ========== Scroll to Top ========== */
+.scroll-top {
+  position: fixed;
+  bottom: 24px;
+  left: 24px;
+  width: 48px; height: 48px;
+  border-radius: 50%;
+  background: var(--primary);
+  color: #fff;
+  display: flex; align-items: center; justify-content: center;
+  font-size: 20px;
+  box-shadow: 0 6px 20px rgba(74,108,247,0.4);
+  cursor: pointer;
+  opacity: 0;
+  pointer-events: none;
+  transition: all 0.3s;
+  z-index: 50;
+}
+.scroll-top.show { opacity: 1; pointer-events: auto; }
+.scroll-top:hover { transform: translateY(-3px); }
+
+/* ========== Responsive ========== */
+@media (max-width: 640px) {
+  .hero { padding: 60px 16px 80px; }
+  .hero h1 { font-size: 30px; }
+  .hero .tagline { font-size: 15px; }
+  .hero .app-icon { width: 80px; height: 80px; font-size: 44px; }
+  .container { padding: 0 14px 40px; margin-top: -40px; }
+  .card { padding: 20px 16px; }
+  .card h2 { font-size: 19px; }
+  .topbar { padding: 10px 14px; }
+  .topbar .back-btn { padding: 7px 14px; font-size: 13px; }
+  .contact-btn .info .value { font-size: 11px; }
+}
+
+/* ========== Print ========== */
+@media print {
+  .topbar, .scroll-top, .hero .cta-btn, .footer { display: none !important; }
+  .hero { background: white !important; color: black !important; padding: 20px; }
+  .card { box-shadow: none; border: 1px solid #ddd; page-break-inside: avoid; }
+  body { background: white; }
+}
+</style>
+</head>
+<body>
+
+<!-- Top Bar -->
+<div class="topbar">
+  <div class="brand">📝 مُذكّر</div>
+  <div class="actions">
+    <a href="index.html" class="back-btn">← فتح التطبيق</a>
+  </div>
+</div>
+
+<!-- Hero -->
+<section class="hero">
+  <div class="hero-content">
+    <div class="app-icon">📝</div>
+    <h1>مُذكّر</h1>
+    <p class="tagline">تطبيقك البسيط لإدارة الملاحظات والمواعيد والتنبيهات — في مكان واحد.</p>
+    <a href="index.html" class="cta-btn">🚀 افتح التطبيق</a>
+  </div>
+</section>
+
+<!-- Main -->
+<div class="container">
+
+  <!-- عن التطبيق -->
+  <div class="card">
+    <h2><span class="emoji">ℹ️</span> عن التطبيق</h2>
+    <p>
+      <strong>مُذكّر</strong> هو تطبيق ويب بسيط ومجاني، بيجمع لك 3 حاجات في مكان واحد:
+      <strong>الملاحظات</strong>، <strong>المواعيد</strong>، و <strong>التنبيهات</strong>.
+    </p>
+    <p>
+      التطبيق بيشتغل على أي جهاز (موبايل، تابلت، كمبيوتر)، وبيتحفظ كتطبيق حقيقي
+      على شاشة الموبايل. وكمان بيشتغل بدون إنترنت بعد أول تحميل.
+    </p>
+    <p>
+      كل البيانات بتتخزن على <strong>جهازك أنت فقط</strong> — مش على أي سيرفر خارجي.
+      يعني خصوصيتك كاملة، ومحدش يقدر يشوف ملاحظاتك.
+    </p>
+  </div>
+
+  <!-- المميزات -->
+  <div class="card">
+    <h2><span class="emoji">✨</span> المميزات</h2>
+    <div class="features-grid">
+      <div class="feature-item">
+        <div class="icon">📝</div>
+        <h4>ملاحظات ذكية</h4>
+        <p>اكتب أي حاجة، وحدد أهميتها بلون (🔴🟠🟢) وصنّفها (💼🏠💡📚🛒).</p>
+      </div>
+      <div class="feature-item">
+        <div class="icon">📅</div>
+        <h4>مواعيد + تقويم</h4>
+        <p>تقويم شهري كامل، مع تكرار (يومي/أسبوعي/شهري) وتذكير قبل الموعد.</p>
+      </div>
+      <div class="feature-item">
+        <div class="icon">🔔</div>
+        <h4>تنبيهات</h4>
+        <p>تنبيهات متكررة بصوت وإشعار على الموبايل، عشان ما تنساش أي حاجة.</p>
+      </div>
+      <div class="feature-item">
+        <div class="icon">☑️</div>
+        <h4>قوائم مهام</h4>
+        <p>اكتب <code>- [ ]</code> جوه الملاحظة، وهتتحول لمربعات قابلة للضغط.</p>
+      </div>
+      <div class="feature-item">
+        <div class="icon">🎨</div>
+        <h4>تخصيص كامل</h4>
+        <p>8 ثيمات جاهزة + ألوان مخصصة + خلفيات + حجم خط.</p>
+      </div>
+      <div class="feature-item">
+        <div class="icon">📖</div>
+        <h4>وضع القراءة</h4>
+        <p>وضع خاص بخلفية سيبيا وخط أكبر، للراحة وقت القراءة الطويلة.</p>
+      </div>
+      <div class="feature-item">
+        <div class="icon">📤</div>
+        <h4>مشاركة + PDF</h4>
+        <p>شارك أي ملاحظة على واتساب/تليجرام، أو صدّرها كملف PDF.</p>
+      </div>
+      <div class="feature-item">
+        <div class="icon">🔄</div>
+        <h4>مزامنة يدوية</h4>
+        <p>صدّر بياناتك كملف JSON واسترجعها من أي جهاز تاني.</p>
+      </div>
+      <div class="feature-item">
+        <div class="icon">🌐</div>
+        <h4>عربي / إنجليزي</h4>
+        <p>التبديل بين اللغة العربية والإنجليزية بضغطة زر.</p>
+      </div>
+      <div class="feature-item">
+        <div class="icon">🌙</div>
+        <h4>وضع ليلي</h4>
+        <p>وضع داكن مريح للعين، يشتغل تلقائياً حسب وقت اليوم.</p>
+      </div>
+      <div class="feature-item">
+        <div class="icon">📱</div>
+        <h4>PWA</h4>
+        <p>ثبّته كتطبيق حقيقي على موبايلك، يشتغل بدون إنترنت.</p>
+      </div>
+      <div class="feature-item">
+        <div class="icon">🔒</div>
+        <h4>خصوصية كاملة</h4>
+        <p>كل بياناتك على جهازك بس — مفيش سيرفر، مفيش تتبع، مفيش إعلانات.</p>
+      </div>
+    </div>
+  </div>
+
+  <!-- دليل الاستخدام -->
+  <div class="card">
+    <h2><span class="emoji">📚</span> دليل الاستخدام</h2>
+
+    <h3>📝 إضافة ملاحظة</h3>
+    <div class="step"><div class="num">1</div><div class="content"><h4>اضغط على زر +</h4><p>الزر الدائري في الركن السفلي.</p></div></div>
+    <div class="step"><div class="num">2</div><div class="content"><h4>اكتب العنوان والمحتوى</h4><p>العنوان اختياري، بس المحتوى مهم.</p></div></div>
+    <div class="step"><div class="num">3</div><div class="content"><h4>اختر الأهمية والتصنيف</h4><p>🔴 عالية / 🟠 متوسطة / 🟢 منخفضة — واختر تصنيف زي 💼 أو 🏠.</p></div></div>
+    <div class="step"><div class="num">4</div><div class="content"><h4>اضغط حفظ</h4><p>الملاحظة هتظهر ككارت في الشبكة.</p></div></div>
+
+    <h3>📅 إضافة موعد</h3>
+    <div class="step"><div class="num">1</div><div class="content"><h4>افتح تاب "المواعيد"</h4><p>هتلاقي تقويم شهري.</p></div></div>
+    <div class="step"><div class="num">2</div><div class="content"><h4>اضغط على أي يوم</h4><p>أو اضغط + مباشرة.</p></div></div>
+    <div class="step"><div class="num">3</div><div class="content"><h4>املأ البيانات</h4><p>العنوان، التاريخ، الوقت، المكان، والتكرار.</p></div></div>
+    <div class="step"><div class="num">4</div><div class="content"><h4>اختر التذكير قبل الموعد</h4><p>5 / 15 / 30 / 60 دقيقة.</p></div></div>
+
+    <h3>🔔 إضافة تنبيه</h3>
+    <div class="step"><div class="num">1</div><div class="content"><h4>افتح تاب "التنبيهات"</h4><p>واضغط +</p></div></div>
+    <div class="step"><div class="num">2</div><div class="content"><h4>اكتب العنوان والوقت</h4><p>مثلاً: "خد الدوا" الساعة 9:00 صباحاً.</p></div></div>
+    <div class="step"><div class="num">3</div><div class="content"><h4>اختر التكرار</h4><p>يومي، أسبوعي، أو بدون.</p></div></div>
+
+    <h3>🎨 تخصيص الشكل</h3>
+    <div class="step"><div class="num">1</div><div class="content"><h4>اضغط على ⚙️</h4><p>في الهيدر فوق.</p></div></div>
+    <div class="step"><div class="num">2</div><div class="content"><h4>اختار ثيم جاهز</h4><p>8 ثيمات مختلفة (Light, Dark, Blue, Green...).</p></div></div>
+    <div class="step"><div class="num">3</div><div class="content"><h4>أو خصص الألوان بنفسك</h4><p>اختار لون أساسي، خلفية، ونص.</p></div></div>
+
+    <h3>☑️ قوائم المهام</h3>
+    <div class="step"><div class="num">1</div><div class="content"><h4>اكتب في الملاحظة</h4><p><code>- [ ] مهمة 1</code><br><code>- [ ] مهمة 2</code></p></div></div>
+    <div class="step"><div class="num">2</div><div class="content"><h4>احفظ</h4><p>هتلاقي المهام ظهرت في الكارت كقائمة.</p></div></div>
+    <div class="step"><div class="num">3</div><div class="content"><h4>اضغط على المربع</h4><p>يتشطب، واضغط تاني يترجع.</p></div></div>
+  </div>
+
+  <!-- الأسئلة الشائعة -->
+  <div class="card">
+    <h2><span class="emoji">❓</span> الأسئلة الشائعة</h2>
+
+    <div class="faq-item">
+      <div class="faq-q" onclick="toggleFaq(this)">هل التطبيق مجاني بالكامل؟</div>
+      <div class="faq-a">أيوه، التطبيق مجاني 100%. مفيش إعلانات، مفيش اشتراكات، مفيش حدود.</div>
+    </div>
+
+    <div class="faq-item">
+      <div class="faq-q" onclick="toggleFaq(this)">هل بياناتي آمنة؟</div>
+      <div class="faq-a">أيوه. كل بياناتك بتتخزن على جهازك فقط في ذاكرة المتصفح (localStorage). محدش — ولا حتى إحنا — يقدر يشوفها.</div>
+    </div>
+
+    <div class="faq-item">
+      <div class="faq-q" onclick="toggleFaq(this)">هل يشتغل بدون إنترنت؟</div>
+      <div class="faq-a">أيوه، بعد أول تحميل للموقع، التطبيق بيشتغل بدون إنترنت تماماً. تقدر تستخدمه في أي وقت.</div>
+    </div>
+
+    <div class="faq-item">
+      <div class="faq-q" onclick="toggleFaq(this)">إزاي أثبته على الموبايل؟</div>
+      <div class="faq-a">
+        <strong>على أندرويد (Chrome):</strong> افتح الرابط، دوس على القائمة (⋮)، واختار "تثبيت التطبيق".<br>
+        <strong>على آيفون (Safari):</strong> افتح الرابط، دوس على زر المشاركة، واختار "إضافة إلى الشاشة الرئيسية".
+      </div>
+    </div>
+
+    <div class="faq-item">
+      <div class="faq-q" onclick="toggleFaq(this)">هل بياناتي بتتنقل بين الأجهزة؟</div>
+      <div class="faq-a">لأ تلقائياً. بس تقدر تصدّر بياناتك كملف JSON من الإعدادات، وترفعها على الجهاز التاني عن طريق زر المزامنة (🔄).</div>
+    </div>
+
+    <div class="faq-item">
+      <div class="faq-q" onclick="toggleFaq(this)">لو مسحت بيانات المتصفح، بياناتي هتروح؟</div>
+      <div class="faq-a">أيوه، للأسف. عشان كده بننصح بعمل نسخة احتياطية دورية من الإعدادات → "تصدير البيانات". التطبيق بيعمل نسخة احتياطية تلقائية كل يوم، بس الأفضل تعملها يدوياً كمان.</div>
+    </div>
+
+    <div class="faq-item">
+      <div class="faq-q" onclick="toggleFaq(this)">إزاي أعمل قائمة مهام داخل ملاحظة؟</div>
+      <div class="faq-a">اكتب في محتوى الملاحظة بالشكل ده:<br><code>- [ ] مهمة 1</code><br><code>- [ ] مهمة 2</code><br>ولما تحفظ، هتظهر كقائمة مربعات قابلة للضغط.</div>
+    </div>
+
+    <div class="faq-item">
+      <div class="faq-q" onclick="toggleFaq(this)">التنبيهات مش بتشتغل لما التطبيق مقفول؟</div>
+      <div class="faq-a">التنبيهات في المتصفح بتشتغل بس لما التطبيق يكون مفتوح. لو عايز تنبيهات دايماً حتى لو التطبيق مقفول، محتاج تطبيق حقيقي — وده مش متاح حالياً.</div>
+    </div>
+
+    <div class="faq-item">
+      <div class="faq-q" onclick="toggleFaq(this)">إزاي أستورد بياناتي من جهاز تاني؟</div>
+      <div class="faq-a">افتح الإعدادات (⚙️) → "استيراد البيانات" → اختار ملف JSON اللي صدّرته من الجهاز التاني.</div>
+    </div>
+
+    <div class="faq-item">
+      <div class="faq-q" onclick="toggleFaq(this)">هل التطبيق بيدعم اللغة الإنجليزية؟</div>
+      <div class="faq-a">أيوه، اضغط على أيقونة 🌐 في الهيدر للتبديل بين العربية والإنجليزية.</div>
+    </div>
+  </div>
+
+  <!-- تواصل معنا -->
+  <div class="card">
+    <h2><span class="emoji">💬</span> تواصل معنا</h2>
+    <p>عندك سؤال، اقتراح، أو مشكلة؟ تواصل معايا على أي من القنوات دي:</p>
+    <div class="contact-grid">
+      <a href="https://wa.me/201092769355" class="contact-btn whatsapp" target="_blank" rel="noopener">
+        <div class="icon-box">📱</div>
+        <div class="info">
+          <div class="title">واتساب</div>
+          <div class="value">01092769355</div>
+        </div>
+      </a>
+      <a href="https://wa.me/201559491625" class="contact-btn whatsapp" target="_blank" rel="noopener">
+        <div class="icon-box">📱</div>
+        <div class="info">
+          <div class="title">واتساب</div>
+          <div class="value">01559491625</div>
+        </div>
+      </a>
+      <a href="https://t.me/+201092769355" class="contact-btn telegram" target="_blank" rel="noopener">
+        <div class="icon-box">✈️</div>
+        <div class="info">
+          <div class="title">تليجرام</div>
+          <div class="value">01092769355</div>
+        </div>
+      </a>
+      <a href="https://t.me/+201559491625" class="contact-btn telegram" target="_blank" rel="noopener">
+        <div class="icon-box">✈️</div>
+        <div class="info">
+          <div class="title">تليجرام</div>
+          <div class="value">01559491625</div>
+        </div>
+      </a>
+      <a href="mailto:karimhussein879@gmail.com" class="contact-btn email">
+        <div class="icon-box">📧</div>
+        <div class="info">
+          <div class="title">إيميل</div>
+          <div class="value">karimhussein879@gmail.com</div>
+        </div>
+      </a>
+      <a href="mailto:Kareemhussein672@gmail.com" class="contact-btn email">
+        <div class="icon-box">📧</div>
+        <div class="info">
+          <div class="title">إيميل</div>
+          <div class="value">Kareemhussein672@gmail.com</div>
+        </div>
+      </a>
+    </div>
+  </div>
+
+  <!-- الترخيص -->
+  <div class="card">
+    <h2><span class="emoji">📄</span> الترخيص والتوثيق</h2>
+    <div class="license-box">
+      <div class="author">Karim Hussein</div>
+      <div class="year">© 2026</div>
+      <div class="rights">
+        تم تطوير هذا التطبيق بواسطة <strong>Karim Hussein</strong>.<br>
+        جميع الحقوق محفوظة.
+      </div>
+    </div>
+  </div>
+
+</div>
+
+<!-- Footer -->
+<footer class="footer">
+  صُنع بـ <span class="heart">❤️</span> بواسطة <strong>Karim Hussein</strong> — © 2026
+</footer>
+
+<!-- Scroll to Top -->
+<button class="scroll-top" id="scrollTop" onclick="window.scrollTo({top:0,behavior:'smooth'})">↑</button>
+
+<script>
+function toggleFaq(el) {
+  const item = el.parentElement;
+  item.classList.toggle('open');
+}
+
+// Scroll to top
+const scrollBtn = document.getElementById('scrollTop');
+window.addEventListener('scroll', () => {
+  if (window.scrollY > 300) scrollBtn.classList.add('show');
+  else scrollBtn.classList.remove('show');
+});
+</script>
+</body>
+</html>
