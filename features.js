@@ -1,9 +1,19 @@
 /* ============================================================
    Mozakker - المميزات الإضافية الكاملة
+   الإصدار: 3.0
    ============================================================ */
 
 (function() {
   'use strict';
+
+  // ==================== escapeHtml احتياطي ====================
+  if (typeof window.escapeHtml === 'undefined') {
+    window.escapeHtml = function(s) {
+      return String(s || '').replace(/[&<>"']/g, c => ({
+        '&': '&amp;', '<': '&lt;', '>': '&gt;', '"': '&quot;', "'": '&#39;'
+      }[c]));
+    };
+  }
 
   // ==================== 1. أصوات التنبيهات ====================
   let audioCtx2 = null;
@@ -15,7 +25,7 @@
     }
   }
 
-  function playSound(type = 'beep') {
+  window.playSound = function(type = 'beep') {
     initAudio2();
     if (!audioCtx2) return;
     try {
@@ -41,23 +51,22 @@
       osc.start(now);
       osc.stop(now + s.dur);
     } catch(e) {}
-  }
+  };
 
-  // نغمة تنبيه (3 نغمات متتالية)
   function playAlert() {
     playSound('alert');
     setTimeout(() => playSound('alert'), 500);
     setTimeout(() => playSound('alert'), 1000);
   }
 
-  // ==================== 2. اهتزاز الموبايل ====================
+  // ==================== 2. اهتزاز ====================
   function vibrate(pattern = [200, 100, 200]) {
     if ('vibrate' in navigator) {
       try { navigator.vibrate(pattern); } catch(e) {}
     }
   }
 
-  // ==================== 3. إشعارات محسّنة ====================
+  // ==================== 3. إشعارات ====================
   function requestNotifPermission() {
     if (!('Notification' in window)) return;
     if (Notification.permission === 'default') {
@@ -79,57 +88,122 @@
     }
   }
 
-  // ==================== 4. To-Do داخل الملاحظات ====================
-  // تحويل سطور الملاحظة لمربعات اختيار
-  window.toggleTodo = function(noteId, index) {
+  // ==================== 4. To-Do Renderer ====================
+  window.renderNotePreview = function(note) {
+    if (!note || !note.body) return '';
+
+    const lines = note.body.split('\n');
+    const hasTodos = lines.some(line => {
+      const t = line.trim();
+      return t.startsWith('- [ ]') || t.startsWith('- [x]') || t.startsWith('- [X]');
+    });
+
+    if (!hasTodos) {
+      return escapeHtml(note.body.slice(0, 150));
+    }
+
+    let html = '';
+    let shown = 0;
+
+    lines.forEach((line, idx) => {
+      if (shown >= 8) return;
+      const trimmed = line.trim();
+      const isUnchecked = trimmed.startsWith('- [ ]');
+      const isChecked = trimmed.startsWith('- [x]') || trimmed.startsWith('- [X]');
+
+      if (isUnchecked || isChecked) {
+        const text = trimmed.replace(/^- \[[ xX]\]\s*/, '');
+        const checked = isChecked;
+
+        html += '<div onclick="event.stopPropagation();window.toggleTodo(\'' + note.id + '\',' + idx + ')" '
+          + 'style="display:flex;align-items:center;gap:6px;margin:3px 0;font-size:13px;cursor:pointer;padding:2px 4px;border-radius:4px;transition:background 0.15s" '
+          + 'onmouseover="this.style.background=\'var(--surface-2)\'" '
+          + 'onmouseout="this.style.background=\'transparent\'">'
+          + '<span style="display:inline-flex;align-items:center;justify-content:center;width:16px;height:16px;border-radius:4px;border:2px solid '
+          + (checked ? 'var(--success)' : 'var(--border)') + ';background:'
+          + (checked ? 'var(--success)' : 'transparent')
+          + ';color:#fff;font-size:10px;flex-shrink:0;transition:all 0.15s">'
+          + (checked ? '✓' : '') + '</span>'
+          + '<span style="'
+          + (checked ? 'text-decoration:line-through;opacity:0.6;' : '')
+          + 'overflow:hidden;text-overflow:ellipsis;white-space:nowrap">'
+          + escapeHtml(text) + '</span>'
+          + '</div>';
+        shown++;
+      } else if (trimmed) {
+        html += '<div style="font-size:12px;color:var(--text-muted);margin:2px 0;overflow:hidden;text-overflow:ellipsis;white-space:nowrap">'
+          + escapeHtml(line) + '</div>';
+      }
+    });
+
+    if (lines.length > 8) {
+      html += '<div style="font-size:11px;color:var(--text-muted);margin-top:4px">...</div>';
+    }
+
+    return html;
+  };
+
+  // ==================== 5. To-Do Toggle ====================
+  window.toggleTodo = function(noteId, lineIndex) {
     try {
       const notes = JSON.parse(localStorage.getItem('moz_notes') || '[]');
       const note = notes.find(n => n.id === noteId);
-      if (!note) return;
-      if (!note.todos) note.todos = {};
-      note.todos[index] = !note.todos[index];
+      if (!note || !note.body) return;
+
+      const lines = note.body.split('\n');
+      const line = lines[lineIndex];
+      if (line === undefined) return;
+
+      const trimmed = line.trim();
+
+      if (trimmed.startsWith('- [ ]')) {
+        lines[lineIndex] = line.replace('- [ ]', '- [x]');
+      } else if (trimmed.startsWith('- [x]') || trimmed.startsWith('- [X]')) {
+        lines[lineIndex] = line.replace(/- \[[xX]\]/, '- [ ]');
+      } else {
+        return;
+      }
+
+      note.body = lines.join('\n');
+      note.updated = Date.now();
       localStorage.setItem('moz_notes', JSON.stringify(notes));
-      // إعادة الرسم
-      if (typeof render === 'function') render();
+
       playSound('click');
-    } catch(e) {}
+
+      if (typeof render === 'function') render();
+    } catch(e) {
+      console.error('خطأ في toggleTodo:', e);
+    }
   };
 
-  // ==================== 5. تصدير PDF ====================
+  // ==================== 6. تصدير PDF ====================
   window.exportNoteAsPDF = function(noteId) {
     try {
       const notes = JSON.parse(localStorage.getItem('moz_notes') || '[]');
       const note = notes.find(n => n.id === noteId);
       if (!note) return;
 
-      const html = `
-        <!DOCTYPE html>
-        <html dir="rtl" lang="ar">
-        <head>
-          <meta charset="UTF-8">
-          <title>${note.title || 'ملاحظة'}</title>
-          <style>
-            body { font-family: Arial, sans-serif; padding: 40px; line-height: 1.8; color: #333; }
-            h1 { color: #4a6cf7; border-bottom: 3px solid #4a6cf7; padding-bottom: 10px; }
-            .meta { color: #888; font-size: 12px; margin-bottom: 20px; }
-            .body { white-space: pre-wrap; font-size: 15px; }
-            .tags { margin-top: 20px; }
-            .tag { background: #eee; padding: 3px 10px; border-radius: 12px; margin: 3px; display: inline-block; font-size: 12px; }
-          </style>
-        </head>
-        <body>
-          <h1>${note.title || '(بدون عنوان)'}</h1>
-          <div class="meta">
-            ${note.importance === 'high' ? '🔴 عالية الأهمية' : note.importance === 'medium' ? '🟠 متوسطة' : '🟢 منخفضة'}
-            • ${new Date(note.updated || Date.now()).toLocaleDateString('ar-EG')}
-          </div>
-          <div class="body">${(note.body || '').replace(/</g, '&lt;')}</div>
-          ${note.tags && note.tags.length ? `<div class="tags">${note.tags.map(t => `<span class="tag">#${t}</span>`).join('')}</div>` : ''}
-          <hr style="margin-top:40px;border:none;border-top:1px solid #ddd">
-          <p style="text-align:center;color:#aaa;font-size:12px">من تطبيق مُذكّر</p>
-        </body>
-        </html>
-      `;
+      const html = '<!DOCTYPE html>'
+        + '<html dir="rtl" lang="ar">'
+        + '<head><meta charset="UTF-8"><title>' + (note.title || 'ملاحظة') + '</title>'
+        + '<style>'
+        + 'body { font-family: Arial, sans-serif; padding: 40px; line-height: 1.8; color: #333; }'
+        + 'h1 { color: #4a6cf7; border-bottom: 3px solid #4a6cf7; padding-bottom: 10px; }'
+        + '.meta { color: #888; font-size: 12px; margin-bottom: 20px; }'
+        + '.body { white-space: pre-wrap; font-size: 15px; }'
+        + '.tag { background: #eee; padding: 3px 10px; border-radius: 12px; margin: 3px; display: inline-block; font-size: 12px; }'
+        + '</style></head><body>'
+        + '<h1>' + (note.title || '(بدون عنوان)') + '</h1>'
+        + '<div class="meta">'
+        + (note.importance === 'high' ? '🔴 عالية الأهمية' : note.importance === 'medium' ? '🟠 متوسطة' : '🟢 منخفضة')
+        + ' • ' + new Date(note.updated || Date.now()).toLocaleDateString('ar-EG')
+        + '</div>'
+        + '<div class="body">' + (note.body || '').replace(/</g, '&lt;') + '</div>'
+        + (note.tags && note.tags.length ? '<div>' + note.tags.map(t => '<span class="tag">#' + t + '</span>').join('') + '</div>' : '')
+        + '<hr style="margin-top:40px;border:none;border-top:1px solid #ddd">'
+        + '<p style="text-align:center;color:#aaa;font-size:12px">من تطبيق مُذكّر</p>'
+        + '</body></html>';
+
       const win = window.open('', '_blank');
       win.document.write(html);
       win.document.close();
@@ -138,7 +212,29 @@
     } catch(e) { alert('خطأ في التصدير'); }
   };
 
-  // ==================== 6. مزامنة يدوية (تصدير/استيراد) ====================
+  // ==================== 7. مشاركة ====================
+  window.shareNote = function(noteId) {
+    try {
+      const notes = JSON.parse(localStorage.getItem('moz_notes') || '[]');
+      const note = notes.find(n => n.id === noteId);
+      if (!note) return;
+      const text = '📝 ' + (note.title || '') + '\n\n' + (note.body || '');
+
+      if (navigator.share) {
+        navigator.share({
+          title: note.title || 'ملاحظة',
+          text: text
+        }).then(() => playSound('success')).catch(() => {});
+      } else {
+        navigator.clipboard.writeText(text).then(() => {
+          playSound('success');
+          alert('✅ تم نسخ الملاحظة!');
+        });
+      }
+    } catch(e) {}
+  };
+
+  // ==================== 8. المزامنة ====================
   window.syncExport = function() {
     try {
       const data = {
@@ -153,11 +249,11 @@
       const url = URL.createObjectURL(blob);
       const a = document.createElement('a');
       a.href = url;
-      a.download = `mozakker-sync-${new Date().toISOString().split('T')[0]}.json`;
+      a.download = 'mozakker-sync-' + new Date().toISOString().split('T')[0] + '.json';
       a.click();
       URL.revokeObjectURL(url);
       playSound('success');
-      alert('✅ تم تصدير البيانات! احفظ الملف على Google Drive.');
+      alert('✅ تم تصدير البيانات!');
     } catch(e) { alert('خطأ في التصدير'); }
   };
 
@@ -177,62 +273,17 @@
           if (data.reminders) localStorage.setItem('moz_reminders', JSON.stringify(data.reminders));
           if (data.settings) localStorage.setItem('moz_settings', JSON.stringify(data.settings));
           playSound('success');
-          alert('✅ تم استيراد البيانات بنجاح! الصفحة هتتحدث دلوقتي.');
+          alert('✅ تم استيراد البيانات!');
           location.reload();
         } catch(err) {
           playSound('error');
-          alert('❌ الملف تالف أو غير صالح');
+          alert('❌ الملف تالف');
         }
       };
       reader.readAsText(file);
     };
     input.click();
   };
-
-  // ==================== 7. مشاركة الملاحظات ====================
-  window.shareNote = function(noteId) {
-    try {
-      const notes = JSON.parse(localStorage.getItem('moz_notes') || '[]');
-      const note = notes.find(n => n.id === noteId);
-      if (!note) return;
-      const text = `📝 ${note.title}\n\n${note.body}`;
-
-      if (navigator.share) {
-        navigator.share({
-          title: note.title || 'ملاحظة',
-          text: text
-        }).then(() => playSound('success')).catch(() => {});
-      } else {
-        // Fallback: نسخ للحافظة
-        navigator.clipboard.writeText(text).then(() => {
-          playSound('success');
-          alert('✅ تم نسخ الملاحظة! الصقها في أي مكان.');
-        });
-      }
-    } catch(e) {}
-  };
-
-  // ==================== 8. تذكيرات ذكية ====================
-  // تذكير بالملاحظات القديمة اللي ما اتعملتش
-  function checkSmartReminders() {
-    try {
-      const notes = JSON.parse(localStorage.getItem('moz_notes') || '[]');
-      const now = Date.now();
-      const threeDaysAgo = now - (3 * 24 * 60 * 60 * 1000);
-      const oldNotes = notes.filter(n =>
-        n.importance === 'high' &&
-        !n.pinned &&
-        (n.updated || n.created) < threeDaysAgo
-      );
-      if (oldNotes.length > 0) {
-        const randomNote = oldNotes[Math.floor(Math.random() * oldNotes.length)];
-        sendNotification(
-          '⏰ تذكير: ملاحظة مهمة',
-          `لسه ما خلصتش: "${randomNote.title}"`
-        );
-      }
-    } catch(e) {}
-  }
 
   // ==================== 9. وضع القراءة ====================
   window.toggleReadingMode = function() {
@@ -242,7 +293,6 @@
     return isReading;
   };
 
-  // CSS لوضع القراءة
   const readingCSS = document.createElement('style');
   readingCSS.textContent = `
     body.reading-mode {
@@ -262,44 +312,43 @@
   `;
   document.head.appendChild(readingCSS);
 
-  // ==================== 10. تصنيفات بألوان ====================
-  const CATEGORIES = {
-    work: { name: 'عمل', color: '#3b82f6', emoji: '💼' },
-    personal: { name: 'شخصي', color: '#8b5cf6', emoji: '🏠' },
-    ideas: { name: 'أفكار', color: '#10b981', emoji: '💡' },
-    study: { name: 'دراسة', color: '#f59e0b', emoji: '📚' },
-    shopping: { name: 'تسوق', color: '#ec4899', emoji: '🛒' },
-    other: { name: 'أخرى', color: '#6b7280', emoji: '📌' }
-  };
+  // ==================== 10. التذكيرات الذكية ====================
+  function checkSmartReminders() {
+    try {
+      const notes = JSON.parse(localStorage.getItem('moz_notes') || '[]');
+      const now = Date.now();
+      const threeDaysAgo = now - (3 * 24 * 60 * 60 * 1000);
+      const oldNotes = notes.filter(n =>
+        n.importance === 'high' &&
+        !n.pinned &&
+        (n.updated || n.created) < threeDaysAgo
+      );
+      if (oldNotes.length > 0) {
+        const randomNote = oldNotes[Math.floor(Math.random() * oldNotes.length)];
+        sendNotification('⏰ تذكير: ملاحظة مهمة', 'لسه ما خلصتش: "' + randomNote.title + '"');
+      }
+    } catch(e) {}
+  }
 
-  window.getCategoryColor = function(cat) {
-    return (CATEGORIES[cat] || CATEGORIES.other).color;
-  };
-
-  // ==================== تحسين التنبيهات ====================
-  // نراقب الوقت كل 30 ثانية
+  // ==================== مراقبة الوقت ====================
   setInterval(() => {
     try {
       const now = new Date();
       const nowTime = String(now.getHours()).padStart(2, '0') + ':' + String(now.getMinutes()).padStart(2, '0');
       const today = now.toISOString().split('T')[0];
 
-      // فحص التنبيهات
       const reminders = JSON.parse(localStorage.getItem('moz_reminders') || '[]');
       reminders.forEach(r => {
         if (!r.enabled) return;
         if (r.time !== nowTime) return;
-
         const key = 'smart_reminder_' + r.id + '_' + today;
         if (sessionStorage.getItem(key)) return;
         sessionStorage.setItem(key, '1');
-
         playAlert();
         vibrate([300, 150, 300, 150, 300]);
         sendNotification('⏰ حان وقت التنبيه', r.title);
       });
 
-      // فحص المواعيد
       const events = JSON.parse(localStorage.getItem('moz_events') || '[]');
       events.forEach(e => {
         if (!e.remind || !e.time) return;
@@ -319,25 +368,19 @@
     } catch(e) {}
   }, 30000);
 
-  // فحص التذكيرات الذكية كل ساعة
   setInterval(checkSmartReminders, 60 * 60 * 1000);
 
-  // ==================== إضافة أزرار للمميزات الجديدة ====================
-  // ننتظر تحميل الصفحة
+  // ==================== إضافة أزرار ====================
   window.addEventListener('load', () => {
     setTimeout(() => {
-      // استرجاع وضع القراءة
       if (localStorage.getItem('moz_reading_mode') === '1') {
         document.body.classList.add('reading-mode');
       }
 
-      // طلب إذن الإشعارات
       if ('Notification' in window && Notification.permission === 'default') {
-        // نطلبه بعد 3 ثواني من فتح التطبيق
         setTimeout(requestNotifPermission, 3000);
       }
 
-      // إضافة زر وضع القراءة في الهيدر
       const header = document.querySelector('.header');
       if (header && !document.getElementById('readingModeBtn')) {
         const btn = document.createElement('button');
@@ -357,7 +400,6 @@
         header.appendChild(btn);
       }
 
-      // إضافة زر المزامنة في الهيدر
       if (header && !document.getElementById('syncBtn')) {
         const btn = document.createElement('button');
         btn.id = 'syncBtn';
@@ -365,7 +407,7 @@
         btn.title = 'مزامنة';
         btn.innerHTML = '<span style="font-size:18px">🔄</span>';
         btn.onclick = () => {
-          const choice = confirm('اضغط OK للتصدير (نسخة احتياطية)\nاضغط Cancel للاستيراد (استرجاع)');
+          const choice = confirm('OK للتصدير (نسخة احتياطية)\nCancel للاستيراد (استرجاع)');
           if (choice) syncExport();
           else syncImport();
         };
@@ -373,80 +415,8 @@
       }
 
       console.log('%c🚀 Mozakker Features Loaded!', 'color:#10b981;font-weight:bold;font-size:14px');
-      console.log('✅ 10 مميزات جديدة شغالة');
+      console.log('✅ 10 مميزات شغالة + To-Do تفاعلي');
     }, 1000);
   });
-// ==================== To-Do Renderer ====================
-window.renderNotePreview = function(note) {
-  if (!note || !note.body) return '';
 
-  const lines = note.body.split('\n');
-  const hasTodos = lines.some(line => line.trim().startsWith('- [ ]') || line.trim().startsWith('- [x]'));
-
-  if (!hasTodos) {
-    return escapeHtml(note.body.slice(0, 150));
-  }
-
-  let html = '';
-  lines.slice(0, 8).forEach(line => {
-    const trimmed = line.trim();
-    const isUnchecked = trimmed.startsWith('- [ ]');
-    const isChecked = trimmed.startsWith('- [x]') || trimmed.startsWith('- [X]');
-
-    if (isUnchecked || isChecked) {
-      const text = trimmed.replace(/^- \[[ xX]\]\s*/, '');
-      const checked = isChecked;
-      html += '<div style="display:flex;align-items:center;gap:6px;margin:3px 0;font-size:13px">'
-        + '<span style="display:inline-flex;align-items:center;justify-content:center;width:16px;height:16px;border-radius:4px;border:2px solid ' + (checked ? 'var(--success)' : 'var(--border)') + ';background:' + (checked ? 'var(--success)' : 'transparent') + ';color:#fff;font-size:10px;flex-shrink:0">' + (checked ? '✓' : '') + '</span>'
-        + '<span style="' + (checked ? 'text-decoration:line-through;opacity:0.6;' : '') + 'overflow:hidden;text-overflow:ellipsis;white-space:nowrap">' + escapeHtml(text) + '</span>'
-        + '</div>';
-    } else if (line.trim()) {
-      html += '<div style="font-size:12px;color:var(--text-muted);margin:2px 0;overflow:hidden;text-overflow:ellipsis;white-space:nowrap">' + escapeHtml(line) + '</div>';
-    }
-  });
-
-  if (lines.length > 8) {
-    html += '<div style="font-size:11px;color:var(--text-muted);margin-top:4px">...</div>';
-  }
-
-  return html;
-};
-// ==================== To-Do Toggle ====================
-window.toggleTodo = function(noteId, lineIndex) {
-  try {
-    const notes = JSON.parse(localStorage.getItem('moz_notes') || '[]');
-    const note = notes.find(n => n.id === noteId);
-    if (!note || !note.body) return;
-
-    const lines = note.body.split('\n');
-    const line = lines[lineIndex];
-    if (!line) return;
-
-    const trimmed = line.trim();
-
-    // لو السطر فيه todo
-    if (trimmed.startsWith('- [ ]')) {
-      lines[lineIndex] = line.replace('- [ ]', '- [x]');
-    } else if (trimmed.startsWith('- [x]') || trimmed.startsWith('- [X]')) {
-      lines[lineIndex] = line.replace(/- \[[xX]\]/, '- [ ]');
-    } else {
-      return;
-    }
-
-    note.body = lines.join('\n');
-    note.updated = Date.now();
-    localStorage.setItem('moz_notes', JSON.stringify(notes));
-
-    // صوت صغير
-    try {
-      if (typeof playSound === 'function') playSound('click');
-    } catch(e) {}
-
-    // إعادة الرسم
-    if (typeof render === 'function') render();
-  } catch(e) {
-    console.error('خطأ في toggleTodo:', e);
-  }
-};
-   
 })();
