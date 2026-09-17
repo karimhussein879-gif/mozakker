@@ -411,4 +411,42 @@ window.renderNotePreview = function(note) {
 
   return html;
 };
+// ==================== To-Do Toggle ====================
+window.toggleTodo = function(noteId, lineIndex) {
+  try {
+    const notes = JSON.parse(localStorage.getItem('moz_notes') || '[]');
+    const note = notes.find(n => n.id === noteId);
+    if (!note || !note.body) return;
+
+    const lines = note.body.split('\n');
+    const line = lines[lineIndex];
+    if (!line) return;
+
+    const trimmed = line.trim();
+
+    // لو السطر فيه todo
+    if (trimmed.startsWith('- [ ]')) {
+      lines[lineIndex] = line.replace('- [ ]', '- [x]');
+    } else if (trimmed.startsWith('- [x]') || trimmed.startsWith('- [X]')) {
+      lines[lineIndex] = line.replace(/- \[[xX]\]/, '- [ ]');
+    } else {
+      return;
+    }
+
+    note.body = lines.join('\n');
+    note.updated = Date.now();
+    localStorage.setItem('moz_notes', JSON.stringify(notes));
+
+    // صوت صغير
+    try {
+      if (typeof playSound === 'function') playSound('click');
+    } catch(e) {}
+
+    // إعادة الرسم
+    if (typeof render === 'function') render();
+  } catch(e) {
+    console.error('خطأ في toggleTodo:', e);
+  }
+};
+   
 })();
