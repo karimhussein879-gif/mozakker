@@ -788,7 +788,7 @@ function renderNotes(q) {
     const tags = (n.tags || []).map(tg => `<span class="tag">#${escapeHtml(tg)}</span>`).join('');
     return `<div class="note-card ${n.pinned?'pinned':''}" data-importance="${n.importance || 'low'}" onclick="editNote('${n.id}')">
       <h3>${escapeHtml(n.title || '(بدون عنوان)')}</h3>
-      <div class="preview">${escapeHtml((n.body || '').slice(0, 150))}</div>
+      <div class="preview">${renderNotePreview(n)}</div>
       <div class="meta">
         <div class="tags">${tags}</div>
         <div class="actions" onclick="event.stopPropagation()">
@@ -918,7 +918,7 @@ function openNoteModal(id) {
     <div class="modal-header"><h2>${id ? t('editNote') : t('addNote')}</h2><button class="close-x" onclick="closeModal()">✕</button></div>
     <div class="modal-body">
       <div class="form-group"><label>${t('noteTitle')}</label><input type="text" id="noteTitle" value="${escapeHtml(n.title)}"></div>
-      <div class="form-group"><label>${t('noteBody')}</label><textarea id="noteBody">${escapeHtml(n.body)}</textarea></div>
+      <div class="form-group"><label>${t('noteBody')}</label><textarea id="noteBody">${escapeHtml(n.body)}</textarea><div style="font-size:11px;color:var(--text-muted);margin-top:4px">💡 اكتب "- [ ] " في بداية السطر لعمل قائمة مهام</div></div>
       <div class="form-group"><label>${t('importance')}</label>
         <div class="importance-row">
           <button type="button" class="importance-btn" data-value="high" onclick="setImportance('high')">🔴 ${t('high')}</button>
