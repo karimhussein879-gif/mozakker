@@ -1,6 +1,6 @@
 /* ============================================================
    Mozakker - المميزات الإضافية
-   الإصدار: 4.0 (بدون تعارض)
+   الإصدار: 5.0 (متوافق مع index.html v2.0)
    ============================================================ */
 
 (function() {
@@ -88,7 +88,7 @@
         reminders: JSON.parse(localStorage.getItem('moz_reminders') || '[]'),
         settings: JSON.parse(localStorage.getItem('moz_settings') || '{}'),
         exported: new Date().toISOString(),
-        version: 2
+        version: 3
       };
       const blob = new Blob([JSON.stringify(data, null, 2)], { type: 'application/json' });
       const url = URL.createObjectURL(blob);
@@ -211,7 +211,7 @@
       }
 
       console.log('%c🚀 Mozakker Features Loaded!', 'color:#10b981;font-weight:bold;font-size:14px');
-      console.log('✅ 5 مميزات شغالة');
+      console.log('✅ 5 مميزات شغالة (متوافق مع v2.0)');
     }, 1000);
   });
 
