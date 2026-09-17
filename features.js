@@ -1,422 +1,1324 @@
+<!DOCTYPE html>
+<html lang="ar" dir="rtl">
+<head>
+<meta charset="UTF-8">
+<meta name="viewport" content="width=device-width,initial-scale=1,user-scalable=no">
+<meta name="theme-color" content="#4a6cf7">
+<title>مُذكّر | Mozakker</title>
+<link rel="icon" href="data:image/svg+xml,<svg xmlns='http://www.w3.org/2000/svg' viewBox='0 0 100 100'><text y='.9em' font-size='90'>📝</text></svg>">
+<link rel="manifest" href="manifest.json">
+<meta name="mobile-web-app-capable" content="yes">
+<meta name="apple-mobile-web-app-capable" content="yes">
+<meta name="apple-mobile-web-app-status-bar-style" content="default">
+<meta name="apple-mobile-web-app-title" content="مُذكّر">
+<link rel="apple-touch-icon" href="apple-touch-icon.png">
+<style>
+:root {
+  --primary: #4a6cf7;
+  --primary-dark: #3a56d4;
+  --bg: #f5f7fb;
+  --surface: #ffffff;
+  --surface-2: #eef1f8;
+  --text: #1a1a2e;
+  --text-muted: #6b7280;
+  --border: #e0e4ee;
+  --shadow: 0 2px 12px rgba(0,0,0,0.06);
+  --shadow-lg: 0 8px 30px rgba(0,0,0,0.12);
+  --radius: 14px;
+  --radius-sm: 8px;
+  --danger: #ef4444;
+  --warning: #f59e0b;
+  --success: #10b981;
+  --font-size: 15px;
+  --wallpaper: none;
+}
+[data-theme="dark"] {
+  --bg: #0f1220;
+  --surface: #1a1f33;
+  --surface-2: #252b45;
+  --text: #e8ecf7;
+  --text-muted: #9aa3bd;
+  --border: #2c3350;
+  --shadow: 0 2px 12px rgba(0,0,0,0.4);
+  --shadow-lg: 0 8px 30px rgba(0,0,0,0.6);
+}
+[data-theme="blue"] { --primary:#0ea5e9; --primary-dark:#0284c7; --bg:#f0f9ff; --surface-2:#e0f2fe; }
+[data-theme="green"] { --primary:#10b981; --primary-dark:#059669; --bg:#f0fdf4; --surface-2:#dcfce7; }
+[data-theme="purple"] { --primary:#8b5cf6; --primary-dark:#7c3aed; --bg:#faf5ff; --surface-2:#f3e8ff; }
+[data-theme="orange"] { --primary:#f97316; --primary-dark:#ea580c; --bg:#fff7ed; --surface-2:#ffedd5; }
+[data-theme="pink"] { --primary:#ec4899; --primary-dark:#db2777; --bg:#fdf2f8; --surface-2:#fce7f3; }
+[data-theme="teal"] { --primary:#14b8a6; --primary-dark:#0d9488; --bg:#f0fdfa; --surface-2:#ccfbf1; }
+[data-theme="red"] { --primary:#ef4444; --primary-dark:#dc2626; --bg:#fef2f2; --surface-2:#fee2e2; }
+
+* { margin:0; padding:0; box-sizing:border-box; -webkit-tap-highlight-color:transparent; }
+html, body {
+  width:100%; min-height:100%;
+  font-family: 'Segoe UI', Tahoma, system-ui, sans-serif;
+  background: var(--bg);
+  background-image: var(--wallpaper);
+  background-size: cover;
+  background-attachment: fixed;
+  background-position: center;
+  color: var(--text);
+  font-size: var(--font-size);
+  transition: background 0.3s, color 0.3s;
+  overflow-x: hidden;
+}
+body::before {
+  content:''; position:fixed; inset:0;
+  background: rgba(0,0,0,0.15);
+  pointer-events:none; z-index:0;
+  display: var(--wallpaper-overlay, none);
+}
+button, input, textarea, select {
+  font-family: inherit; font-size: inherit; color: inherit;
+}
+button { cursor:pointer; border:none; background:none; }
+a { color: var(--primary); text-decoration:none; }
+::-webkit-scrollbar { width:8px; height:8px; }
+::-webkit-scrollbar-track { background: transparent; }
+::-webkit-scrollbar-thumb { background: var(--border); border-radius:4px; }
+::-webkit-scrollbar-thumb:hover { background: var(--text-muted); }
+
+.app {
+  position: relative; z-index:1;
+  min-height:100vh; display:flex; flex-direction:column;
+}
+
+.header {
+  background: var(--surface);
+  border-bottom: 1px solid var(--border);
+  padding: 10px 14px;
+  display:flex; align-items:center; gap:10px;
+  position: sticky; top:0; z-index:100;
+  box-shadow: var(--shadow);
+  flex-wrap: wrap;
+}
+.logo {
+  font-weight:800; font-size:18px; color:var(--primary);
+  display:flex; align-items:center; gap:6px;
+  white-space:nowrap;
+}
+.search-bar {
+  flex:1; min-width:180px;
+  background: var(--surface-2);
+  border-radius: 999px;
+  padding: 8px 14px;
+  display:flex; align-items:center; gap:8px;
+  border: 1px solid transparent;
+  transition: border 0.2s;
+}
+.search-bar:focus-within { border-color: var(--primary); }
+.search-bar input {
+  flex:1; background:none; border:none; outline:none;
+  font-size: 14px;
+}
+.search-bar svg { width:16px; height:16px; color: var(--text-muted); flex-shrink:0; }
+.icon-btn {
+  width:38px; height:38px; border-radius: 10px;
+  display:flex; align-items:center; justify-content:center;
+  background: var(--surface-2);
+  transition: background 0.2s, transform 0.1s;
+  flex-shrink:0;
+}
+.icon-btn:hover { background: var(--primary); color:#fff; }
+.icon-btn:active { transform: scale(0.94); }
+.icon-btn svg { width:18px; height:18px; }
+
+.tabs {
+  display:flex; gap:4px; padding: 10px 12px 0;
+  overflow-x:auto; background: var(--bg);
+  scrollbar-width: none;
+}
+.tabs::-webkit-scrollbar { display:none; }
+.tab {
+  padding: 9px 18px; border-radius: 999px;
+  font-weight:600; font-size:14px; white-space:nowrap;
+  display:flex; align-items:center; gap:6px;
+  background: var(--surface);
+  border: 1px solid var(--border);
+  transition: all 0.2s;
+}
+.tab.active {
+  background: var(--primary); color:#fff;
+  border-color: var(--primary);
+  box-shadow: 0 4px 12px rgba(74,108,247,0.3);
+}
+.tab .badge {
+  background: var(--danger); color:#fff;
+  font-size:10px; padding:2px 6px; border-radius:999px;
+  min-width:18px; text-align:center;
+}
+.tab.active .badge { background:#fff; color: var(--primary); }
+
+.main { flex:1; padding: 12px; }
+
+.notes-grid {
+  display:grid;
+  grid-template-columns: repeat(auto-fill, minmax(260px, 1fr));
+  gap: 12px;
+}
+.note-card {
+  background: var(--surface);
+  border-radius: var(--radius);
+  padding: 14px;
+  box-shadow: var(--shadow);
+  border-right: 4px solid var(--success);
+  transition: transform 0.15s, box-shadow 0.15s;
+  position:relative;
+  cursor:pointer;
+  display:flex; flex-direction:column;
+  min-height: 100px;
+}
+.note-card:hover {
+  transform: translateY(-3px);
+  box-shadow: var(--shadow-lg);
+}
+.note-card[data-importance="high"] { border-right-color: var(--danger); }
+.note-card[data-importance="medium"] { border-right-color: var(--warning); }
+.note-card[data-importance="low"] { border-right-color: var(--success); }
+.note-card.pinned::before {
+  content:'📌'; position:absolute; top:6px; left:8px;
+  font-size:14px;
+}
+.note-card h3 {
+  font-size:15px; margin-bottom:6px;
+  overflow:hidden; text-overflow:ellipsis;
+  white-space:nowrap; padding-left:20px;
+}
+.note-card .preview {
+  font-size:13px; color: var(--text-muted);
+  line-height:1.5; flex:1;
+  overflow:hidden;
+  display:-webkit-box; -webkit-line-clamp:3; -webkit-box-orient:vertical;
+}
+.note-card .meta {
+  display:flex; justify-content:space-between; align-items:center;
+  margin-top:10px; padding-top:8px;
+  border-top:1px solid var(--border);
+  font-size:11px; color: var(--text-muted);
+}
+.note-card .tags { display:flex; gap:4px; flex-wrap:wrap; }
+.tag {
+  background: var(--surface-2); padding:2px 8px;
+  border-radius:999px; font-size:10px;
+}
+.note-card .actions {
+  display:flex; gap:4px;
+  opacity:0; transition: opacity 0.2s;
+}
+.note-card:hover .actions { opacity:1; }
+.note-card .actions button {
+  width:26px; height:26px; border-radius:6px;
+  display:flex; align-items:center; justify-content:center;
+  background: var(--surface-2);
+  font-size:12px;
+}
+.note-card .actions button:hover { background: var(--primary); color:#fff; }
+
+.empty {
+  text-align:center; padding: 60px 20px;
+  color: var(--text-muted);
+}
+.empty .icon { font-size: 64px; margin-bottom:12px; }
+.empty h3 { color: var(--text); margin-bottom:6px; }
+
+.fab {
+  position: fixed; bottom: 22px; left: 22px;
+  width: 58px; height:58px; border-radius:50%;
+  background: var(--primary); color:#fff;
+  display:flex; align-items:center; justify-content:center;
+  box-shadow: 0 6px 20px rgba(74,108,247,0.45);
+  font-size: 28px; font-weight:300;
+  transition: transform 0.15s, box-shadow 0.2s;
+  z-index: 50;
+}
+.fab:hover { transform: scale(1.08) rotate(90deg); }
+.fab:active { transform: scale(0.95); }
+
+.modal {
+  position: fixed; inset:0; z-index: 200;
+  background: rgba(0,0,0,0.6);
+  display:none; align-items: center; justify-content: center;
+  padding: 16px;
+  backdrop-filter: blur(4px);
+}
+.modal.show { display:flex; animation: fadeIn 0.2s; }
+@keyframes fadeIn { from { opacity:0; } to { opacity:1; } }
+.modal-box {
+  background: var(--surface);
+  border-radius: var(--radius);
+  width: 100%; max-width: 540px;
+  max-height: 90vh; overflow-y:auto;
+  box-shadow: var(--shadow-lg);
+  animation: slideUp 0.25s ease;
+}
+@keyframes slideUp { from { transform: translateY(30px); opacity:0; } to { transform: translateY(0); opacity:1; } }
+.modal-header {
+  display:flex; justify-content:space-between; align-items:center;
+  padding: 14px 18px;
+  border-bottom: 1px solid var(--border);
+  position: sticky; top:0; background: var(--surface); z-index:1;
+}
+.modal-header h2 { font-size:16px; color: var(--primary); }
+.modal-body { padding: 18px; }
+.modal-footer {
+  padding: 12px 18px;
+  border-top: 1px solid var(--border);
+  display:flex; gap:8px; justify-content:flex-end;
+  position: sticky; bottom:0; background: var(--surface);
+}
+.close-x {
+  width:32px; height:32px; border-radius:8px;
+  display:flex; align-items:center; justify-content:center;
+  font-size:18px; color: var(--text-muted);
+}
+.close-x:hover { background: var(--danger); color:#fff; }
+
+.form-group { margin-bottom: 14px; }
+.form-group label {
+  display:block; margin-bottom:6px;
+  font-size:13px; font-weight:600;
+  color: var(--text-muted);
+}
+.form-group input[type="text"],
+.form-group input[type="datetime-local"],
+.form-group input[type="number"],
+.form-group input[type="time"],
+.form-group input[type="date"],
+.form-group textarea,
+.form-group select {
+  width:100%;
+  background: var(--surface-2);
+  border: 1px solid var(--border);
+  border-radius: var(--radius-sm);
+  padding: 10px 12px;
+  font-size:14px;
+  outline:none;
+  transition: border 0.2s;
+}
+.form-group input:focus,
+.form-group textarea:focus,
+.form-group select:focus {
+  border-color: var(--primary);
+}
+.form-group textarea { resize: vertical; min-height: 90px; }
+
+.btn {
+  padding: 10px 18px; border-radius: var(--radius-sm);
+  font-weight:600; font-size:14px;
+  display:inline-flex; align-items:center; gap:6px;
+  transition: all 0.15s;
+  background: var(--surface-2); color: var(--text);
+}
+.btn:hover { filter: brightness(0.95); }
+.btn:active { transform: scale(0.97); }
+.btn.primary { background: var(--primary); color:#fff; }
+.btn.primary:hover { background: var(--primary-dark); filter:none; }
+.btn.danger { background: var(--danger); color:#fff; }
+.btn.ghost { background: transparent; border:1px solid var(--border); }
+.btn.block { width:100%; justify-content:center; }
+
+.importance-row { display:flex; gap:8px; }
+.importance-btn {
+  flex:1; padding:10px;
+  border-radius: var(--radius-sm);
+  background: var(--surface-2);
+  border: 2px solid transparent;
+  font-size:13px; font-weight:600;
+  display:flex; align-items:center; justify-content:center; gap:4px;
+  transition: all 0.15s;
+}
+.importance-btn[data-value="high"].active { background: #fee2e2; border-color: var(--danger); color: var(--danger); }
+.importance-btn[data-value="medium"].active { background: #ffedd5; border-color: var(--warning); color: #c2410c; }
+.importance-btn[data-value="low"].active { background: #d1fae5; border-color: var(--success); color: #047857; }
+
+.cal-header {
+  display:flex; justify-content:space-between; align-items:center;
+  margin-bottom: 12px; padding: 0 4px;
+}
+.cal-title { font-size:18px; font-weight:700; }
+.cal-grid {
+  display: grid; grid-template-columns: repeat(7, 1fr);
+  gap: 4px;
+  background: var(--surface);
+  padding: 10px;
+  border-radius: var(--radius);
+  box-shadow: var(--shadow);
+}
+.cal-day-name {
+  text-align:center; font-size:11px; font-weight:700;
+  color: var(--text-muted); padding: 6px 0;
+}
+.cal-day {
+  aspect-ratio: 1;
+  display:flex; flex-direction:column;
+  align-items:center; justify-content:center;
+  border-radius: var(--radius-sm);
+  font-size: 13px; font-weight:600;
+  cursor:pointer;
+  position:relative;
+  transition: background 0.15s;
+  min-height: 38px;
+}
+.cal-day:hover { background: var(--surface-2); }
+.cal-day.other-month { color: var(--text-muted); opacity:0.4; }
+.cal-day.today { background: var(--primary); color:#fff; }
+.cal-day.selected { outline: 2px solid var(--primary); outline-offset: -2px; }
+.cal-day .dots { display:flex; gap:2px; position:absolute; bottom:3px; }
+.cal-day .dot { width:4px; height:4px; border-radius:50%; }
+.cal-day .dot.high { background: var(--danger); }
+.cal-day .dot.medium { background: var(--warning); }
+.cal-day .dot.low { background: var(--success); }
+
+.event-item {
+  background: var(--surface);
+  border-radius: var(--radius);
+  padding: 12px 14px;
+  margin-bottom: 8px;
+  box-shadow: var(--shadow);
+  display:flex; gap:12px;
+  border-right: 4px solid var(--primary);
+  transition: transform 0.15s;
+}
+.event-item:hover { transform: translateX(-3px); }
+.event-item[data-importance="high"] { border-right-color: var(--danger); }
+.event-item[data-importance="medium"] { border-right-color: var(--warning); }
+.event-item[data-importance="low"] { border-right-color: var(--success); }
+.event-time {
+  font-size:12px; color: var(--text-muted);
+  min-width: 60px; font-weight:700;
+}
+.event-body { flex:1; }
+.event-body h4 { font-size:14px; margin-bottom:3px; }
+.event-body p { font-size:12px; color: var(--text-muted); }
+
+.reminder-item {
+  background: var(--surface);
+  border-radius: var(--radius);
+  padding: 12px 14px;
+  margin-bottom: 8px;
+  box-shadow: var(--shadow);
+  display:flex; align-items:center; gap:12px;
+}
+.reminder-item.off { opacity:0.5; }
+.reminder-icon {
+  width:38px; height:38px; border-radius:50%;
+  display:flex; align-items:center; justify-content:center;
+  background: var(--surface-2); font-size:18px;
+}
+.reminder-info { flex:1; }
+.reminder-info h4 { font-size:14px; margin-bottom:2px; }
+.reminder-info p { font-size:12px; color: var(--text-muted); }
+.switch {
+  width:44px; height:24px; border-radius:999px;
+  background: var(--border); position:relative;
+  transition: background 0.2s; flex-shrink:0;
+}
+.switch::after {
+  content:''; position:absolute; top:2px; right:2px;
+  width:20px; height:20px; border-radius:50%;
+  background:#fff; transition: transform 0.2s;
+  box-shadow: 0 1px 3px rgba(0,0,0,0.2);
+}
+.switch.on { background: var(--primary); }
+.switch.on::after { transform: translateX(-20px); }
+
+.toast {
+  position: fixed; bottom: 90px; left: 50%;
+  transform: translateX(-50%) translateY(20px);
+  background: var(--text); color: var(--surface);
+  padding: 10px 20px; border-radius: 999px;
+  font-weight:600; font-size:13px;
+  box-shadow: var(--shadow-lg);
+  z-index: 300; opacity:0;
+  transition: all 0.3s;
+  pointer-events:none;
+  max-width: 90vw; text-align:center;
+}
+.toast.show { opacity:1; transform: translateX(-50%) translateY(0); }
+.toast.success { background: var(--success); color:#fff; }
+.toast.error { background: var(--danger); color:#fff; }
+
+.settings-section {
+  background: var(--surface);
+  border-radius: var(--radius);
+  padding: 16px;
+  margin-bottom: 12px;
+  box-shadow: var(--shadow);
+}
+.settings-section h3 {
+  font-size:14px; color: var(--primary);
+  margin-bottom: 12px;
+  display:flex; align-items:center; gap:6px;
+}
+.color-picker-row {
+  display:flex; align-items:center; gap:10px;
+  padding: 8px 0;
+  border-bottom: 1px solid var(--border);
+}
+.color-picker-row:last-child { border-bottom:none; }
+.color-picker-row label { flex:1; font-size:13px; font-weight:600; }
+.color-picker-row input[type="color"] {
+  width:44px; height:32px; border:none; border-radius:6px;
+  cursor:pointer; background: transparent;
+}
+.theme-grid {
+  display:grid; grid-template-columns: repeat(auto-fill, minmax(80px, 1fr));
+  gap: 8px;
+}
+.theme-btn {
+  aspect-ratio: 1.4;
+  border-radius: var(--radius-sm);
+  display:flex; align-items:center; justify-content:center;
+  font-weight:700; font-size:12px;
+  border: 2px solid var(--border);
+  transition: all 0.15s;
+}
+.theme-btn:hover { transform: scale(1.05); }
+.theme-btn.active { border-color: var(--text); transform: scale(1.08); }
+
+.stats-grid {
+  display: grid; grid-template-columns: repeat(auto-fit, minmax(120px, 1fr));
+  gap: 10px;
+}
+.stat-card {
+  background: var(--surface);
+  border-radius: var(--radius);
+  padding: 14px;
+  text-align:center;
+  box-shadow: var(--shadow);
+}
+.stat-card .num { font-size:26px; font-weight:800; color: var(--primary); }
+.stat-card .lbl { font-size:12px; color: var(--text-muted); margin-top:4px; }
+
+@media (max-width: 640px) {
+  .logo span { display:none; }
+  .notes-grid { grid-template-columns: 1fr; }
+  .cal-day { font-size:12px; min-height: 34px; }
+  .modal-box { max-height: 95vh; }
+  .fab { bottom:16px; left:16px; width:52px; height:52px; }
+  .tab { padding: 8px 14px; font-size:13px; }
+}
+
+@media print {
+  .header, .tabs, .fab, .modal-footer, .actions { display:none !important; }
+  body { background:#fff; color:#000; }
+  .note-card, .event-item, .reminder-item { box-shadow:none; border:1px solid #ccc; }
+}
+
+.hidden { display:none !important; }
+.mt-1 { margin-top: 8px; }
+.mt-2 { margin-top: 16px; }
+.mb-1 { margin-bottom: 8px; }
+.text-muted { color: var(--text-muted); }
+.text-center { text-align:center; }
+.row { display:flex; gap:8px; align-items:center; }
+.grow { flex:1; }
+</style>
+</head>
+<body>
+
+<div class="app">
+  <header class="header">
+    <div class="logo">📝 <span data-i18n="appName">مُذكّر</span></div>
+    <div class="search-bar">
+      <svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2"><circle cx="11" cy="11" r="8"/><path d="m21 21-4.3-4.3"/></svg>
+      <input type="text" id="globalSearch" data-i18n-ph="search" placeholder="ابحث في كل حاجة...">
+    </div>
+    <button class="icon-btn" id="themeToggle" title="Theme">
+      <svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2"><path d="M21 12.79A9 9 0 1 1 11.21 3 7 7 0 0 0 21 12.79z"/></svg>
+    </button>
+    <button class="icon-btn" id="langToggle" title="Language">
+      <svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2"><circle cx="12" cy="12" r="10"/><path d="M2 12h20M12 2a15.3 15.3 0 0 1 4 10 15.3 15.3 0 0 1-4 10 15.3 15.3 0 0 1-4-10 15.3 15.3 0 0 1 4-10z"/></svg>
+    </button>
+    <button class="icon-btn" id="settingsBtn" title="Settings">
+      <svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2"><circle cx="12" cy="12" r="3"/><path d="M19.4 15a1.65 1.65 0 0 0 .33 1.82l.06.06a2 2 0 0 1 0 2.83 2 2 0 0 1-2.83 0l-.06-.06a1.65 1.65 0 0 0-1.82-.33 1.65 1.65 0 0 0-1 1.51V21a2 2 0 0 1-2 2 2 2 0 0 1-2-2v-.09A1.65 1.65 0 0 0 9 19.4a1.65 1.65 0 0 0-1.82.33l-.06.06a2 2 0 0 1-2.83 0 2 2 0 0 1 0-2.83l.06-.06a1.65 1.65 0 0 0 .33-1.82 1.65 1.65 0 0 0-1.51-1H3a2 2 0 0 1-2-2 2 2 0 0 1 2-2h.09A1.65 1.65 0 0 0 4.6 9a1.65 1.65 0 0 0-.33-1.82l-.06-.06a2 2 0 0 1 0-2.83 2 2 0 0 1 2.83 0l.06.06a1.65 1.65 0 0 0 1.82.33H9a1.65 1.65 0 0 0 1-1.51V3a2 2 0 0 1 2-2 2 2 0 0 1 2 2v.09a1.65 1.65 0 0 0 1 1.51 1.65 1.65 0 0 0 1.82-.33l.06-.06a2 2 0 0 1 2.83 0 2 2 0 0 1 0 2.83l-.06.06a1.65 1.65 0 0 0-.33 1.82V9a1.65 1.65 0 0 0 1.51 1H21a2 2 0 0 1 2 2 2 2 0 0 1-2 2h-.09a1.65 1.65 0 0 0-1.51 1z"/></svg>
+    </button>
+  </header>
+
+  <nav class="tabs" id="tabs">
+    <button class="tab active" data-tab="notes">📝 <span data-i18n="notes">الملاحظات</span> <span class="badge" id="notesBadge">0</span></button>
+    <button class="tab" data-tab="events">📅 <span data-i18n="events">المواعيد</span> <span class="badge" id="eventsBadge">0</span></button>
+    <button class="tab" data-tab="reminders">🔔 <span data-i18n="reminders">التنبيهات</span> <span class="badge" id="remindersBadge">0</span></button>
+    <button class="tab" data-tab="today">⭐ <span data-i18n="today">اليوم</span></button>
+    <button class="tab" data-tab="stats">📊 <span data-i18n="stats">إحصائيات</span></button>
+  </nav>
+
+  <main class="main" id="main"></main>
+
+  <button class="fab" id="fab">+</button>
+</div>
+
+<div class="modal" id="modal">
+  <div class="modal-box" id="modalBox"></div>
+</div>
+
+<div class="toast" id="toast"></div>
+
+<script>
 /* ============================================================
-   Mozakker - المميزات الإضافية الكاملة
-   الإصدار: 3.0
+   مُذكّر | Mozakker - Full Logic
    ============================================================ */
 
-(function() {
-  'use strict';
-
-  // ==================== escapeHtml احتياطي ====================
-  if (typeof window.escapeHtml === 'undefined') {
-    window.escapeHtml = function(s) {
-      return String(s || '').replace(/[&<>"']/g, c => ({
-        '&': '&amp;', '<': '&lt;', '>': '&gt;', '"': '&quot;', "'": '&#39;'
-      }[c]));
-    };
+const I18N = {
+  ar: {
+    appName: 'مُذكّر', search: 'ابحث في كل حاجة...', notes: 'الملاحظات', events: 'المواعيد',
+    reminders: 'التنبيهات', today: 'اليوم', stats: 'إحصائيات', settings: 'الإعدادات',
+    addNote: 'ملاحظة جديدة', editNote: 'تعديل الملاحظة', noteTitle: 'العنوان',
+    noteBody: 'المحتوى', importance: 'الأهمية', high: 'عالية', medium: 'متوسطة', low: 'منخفضة',
+    tags: 'الوسوم (افصل بفاصلة)', save: 'حفظ', cancel: 'إلغاء', delete: 'حذف',
+    addEvent: 'موعد جديد', editEvent: 'تعديل الموعد', eventTitle: 'عنوان الموعد',
+    eventDesc: 'الوصف', startTime: 'وقت البداية', endTime: 'وقت النهاية (اختياري)',
+    location: 'المكان', remindBefore: 'التنبيه قبل الموعد', repeat: 'التكرار',
+    none: 'بدون', daily: 'يومي', weekly: 'أسبوعي', monthly: 'شهري', yearly: 'سنوي',
+    addReminder: 'تنبيه جديد', reminderTitle: 'عنوان التنبيه', reminderTime: 'الوقت',
+    repeatDaily: 'يتكرر يومياً', repeatWeekly: 'يتكرر أسبوعياً',
+    noNotes: 'مفيش ملاحظات لسه', noNotesHint: 'اضغط + عشان تضيف أول ملاحظة',
+    noEvents: 'مفيش مواعيد', noEventsHint: 'اضغط + عشان تضيف أول موعد',
+    noReminders: 'مفيش تنبيهات', noRemindersHint: 'اضغط + عشان تضيف أول تنبيه',
+    noToday: 'مفيش حاجة النهارده', noTodayHint: 'استمتع بيومك! ☕',
+    todayEvents: 'مواعيد النهارده', todayReminders: 'تنبيهات النهارده',
+    todayNotes: 'ملاحظات مهمة', pinned: 'مثبتة', deleteConfirm: 'متأكد إنك عايز تحذف؟',
+    saved: 'تم الحفظ ✅', deleted: 'تم الحذف', restored: 'تم الاسترجاع',
+    copied: 'تم النسخ 📋', customColors: 'ألوان مخصصة',
+    primaryColor: 'اللون الأساسي', bgColor: 'لون الخلفية', textColor: 'لون النص',
+    wallpaper: 'صورة الخلفية (رابط)', fontSize: 'حجم الخط', small: 'صغير',
+    normal: 'متوسط', large: 'كبير', themePresets: 'ثيمات جاهزة',
+    export: 'تصدير البيانات', import: 'استيراد البيانات', clearAll: 'حذف كل البيانات',
+    clearAllConfirm: 'متأكد؟ كل البيانات هتتمسح نهائياً!', data: 'البيانات',
+    language: 'اللغة', arabic: 'العربية', english: 'English',
+    totalNotes: 'إجمالي الملاحظات', totalEvents: 'إجمالي المواعيد', totalReminders: 'إجمالي التنبيهات',
+    highImportance: 'عالية الأهمية', thisWeek: 'هذا الأسبوع',
+    pin: 'تثبيت', unpin: 'إلغاء التثبيت', copy: 'نسخ',
+    noteAdded: 'تمت إضافة الملاحظة', noteUpdated: 'تم تحديث الملاحظة',
+    eventAdded: 'تمت إضافة الموعد', eventUpdated: 'تم تحديث الموعد',
+    reminderAdded: 'تمت إضافة التنبيه', reminderUpdated: 'تم تحديث التنبيه',
+    reminderDue: '⏰ حان وقت التنبيه', eventSoon: '🔔 موعدك قريب',
+    allowNotif: 'السماح بالإشعارات', notifGranted: 'الإشعارات مسموح بها ✅',
+    notifDenied: 'الإشعارات مرفوضة ❌', notifDefault: 'اضغط للسماح بالإشعارات',
+    selectDate: 'اختر تاريخ', minutes: 'دقيقة', hours: 'ساعة',
+    noSearch: 'مفيش نتائج', close: 'إغلاق',
+  },
+  en: {
+    appName: 'Mozakker', search: 'Search everything...', notes: 'Notes', events: 'Events',
+    reminders: 'Reminders', today: 'Today', stats: 'Stats', settings: 'Settings',
+    addNote: 'New Note', editNote: 'Edit Note', noteTitle: 'Title',
+    noteBody: 'Content', importance: 'Importance', high: 'High', medium: 'Medium', low: 'Low',
+    tags: 'Tags (comma separated)', save: 'Save', cancel: 'Cancel', delete: 'Delete',
+    addEvent: 'New Event', editEvent: 'Edit Event', eventTitle: 'Event Title',
+    eventDesc: 'Description', startTime: 'Start Time', endTime: 'End Time',
+    location: 'Location', remindBefore: 'Remind Before', repeat: 'Repeat',
+    none: 'None', daily: 'Daily', weekly: 'Weekly', monthly: 'Monthly', yearly: 'Yearly',
+    addReminder: 'New Reminder', reminderTitle: 'Reminder Title', reminderTime: 'Time',
+    repeatDaily: 'Repeat daily', repeatWeekly: 'Repeat weekly',
+    noNotes: 'No notes yet', noNotesHint: 'Tap + to add your first note',
+    noEvents: 'No events', noEventsHint: 'Tap + to add your first event',
+    noReminders: 'No reminders', noRemindersHint: 'Tap + to add your first reminder',
+    noToday: 'Nothing for today', noTodayHint: 'Enjoy your day!',
+    todayEvents: "Today's Events", todayReminders: "Today's Reminders",
+    todayNotes: 'Important Notes', pinned: 'Pinned', deleteConfirm: 'Are you sure you want to delete?',
+    saved: 'Saved ✅', deleted: 'Deleted', restored: 'Restored',
+    copied: 'Copied 📋', customColors: 'Custom Colors',
+    primaryColor: 'Primary Color', bgColor: 'Background', textColor: 'Text Color',
+    wallpaper: 'Wallpaper (URL)', fontSize: 'Font Size', small: 'Small',
+    normal: 'Normal', large: 'Large', themePresets: 'Preset Themes',
+    export: 'Export Data', import: 'Import Data', clearAll: 'Clear All Data',
+    clearAllConfirm: 'Sure? All data will be deleted!', data: 'Data',
+    language: 'Language', arabic: 'العربية', english: 'English',
+    totalNotes: 'Total Notes', totalEvents: 'Total Events', totalReminders: 'Total Reminders',
+    highImportance: 'High Importance', thisWeek: 'This Week',
+    pin: 'Pin', unpin: 'Unpin', copy: 'Copy',
+    noteAdded: 'Note added', noteUpdated: 'Note updated',
+    eventAdded: 'Event added', eventUpdated: 'Event updated',
+    reminderAdded: 'Reminder added', reminderUpdated: 'Reminder updated',
+    reminderDue: '⏰ Reminder time', eventSoon: '🔔 Event soon',
+    allowNotif: 'Allow Notifications', notifGranted: 'Notifications allowed ✅',
+    notifDenied: 'Notifications denied ❌', notifDefault: 'Tap to allow notifications',
+    selectDate: 'Select date', minutes: 'min', hours: 'hr',
+    noSearch: 'No results', close: 'Close',
   }
+};
+let LANG = localStorage.getItem('moz_lang') || 'ar';
+function t(k) { return I18N[LANG][k] || k; }
+function applyI18n() {
+  document.documentElement.lang = LANG;
+  document.documentElement.dir = LANG === 'ar' ? 'rtl' : 'ltr';
+  document.querySelectorAll('[data-i18n]').forEach(el => el.textContent = t(el.dataset.i18n));
+  document.querySelectorAll('[data-i18n-ph]').forEach(el => el.placeholder = t(el.dataset.i18nPh));
+}
 
-  // ==================== 1. أصوات التنبيهات ====================
-  let audioCtx2 = null;
-  function initAudio2() {
-    if (!audioCtx2) {
-      try {
-        audioCtx2 = new (window.AudioContext || window.webkitAudioContext)();
-      } catch(e) {}
-    }
+const DB = { notes:'moz_notes', events:'moz_events', reminders:'moz_reminders', settings:'moz_settings', backup:'moz_backup' };
+function load(key, def = []) { try { return JSON.parse(localStorage.getItem(key)) || def; } catch(e) { return def; } }
+function save(key, val) { localStorage.setItem(key, JSON.stringify(val)); }
+
+let notes = load(DB.notes);
+let events = load(DB.events);
+let reminders = load(DB.reminders);
+let settings = load(DB.settings, {
+  theme: 'light', primary: '#4a6cf7', bg: '#f5f7fb', text: '#1a1a2e',
+  wallpaper: '', fontSize: 15
+});
+
+function autoBackup() {
+  const last = localStorage.getItem('moz_last_backup');
+  const today = new Date().toDateString();
+  if (last !== today) {
+    save(DB.backup, { notes, events, reminders, date: today });
+    localStorage.setItem('moz_last_backup', today);
   }
+}
 
-  window.playSound = function(type = 'beep') {
-    initAudio2();
-    if (!audioCtx2) return;
-    try {
-      const now = audioCtx2.currentTime;
-      const osc = audioCtx2.createOscillator();
-      const gain = audioCtx2.createGain();
-      osc.connect(gain);
-      gain.connect(audioCtx2.destination);
+function uid() { return Date.now().toString(36) + Math.random().toString(36).slice(2, 8); }
+function pad(n) { return String(n).padStart(2, '0'); }
+function fmtDate(d) { const dt = new Date(d); return `${dt.getFullYear()}-${pad(dt.getMonth()+1)}-${pad(dt.getDate())}`; }
+function escapeHtml(s) { return String(s || '').replace(/[&<>"']/g, c => ({'&':'&amp;','<':'&lt;','>':'&gt;','"':'&quot;',"'":'&#39;'}[c])); }
+function toast(msg, type = '') {
+  const el = document.getElementById('toast');
+  el.textContent = msg;
+  el.className = 'toast show ' + type;
+  clearTimeout(el._t);
+  el._t = setTimeout(() => el.className = 'toast ' + type, 2200);
+}
 
-      const sounds = {
-        beep:    { freq: 880,  dur: 0.15, type: 'sine' },
-        success: { freq: 1046, dur: 0.2,  type: 'sine' },
-        error:   { freq: 220,  dur: 0.2,  type: 'sawtooth' },
-        alert:   { freq: 660,  dur: 0.4,  type: 'square' },
-        click:   { freq: 400,  dur: 0.05, type: 'square' },
-      };
-      const s = sounds[type] || sounds.beep;
+let undoStack = [];
+function pushUndo(action) { undoStack.push(action); if (undoStack.length > 20) undoStack.shift(); }
+function undo() {
+  const last = undoStack.pop();
+  if (!last) { toast('Nothing to undo'); return; }
+  if (last.type === 'delete-note') { notes.push(last.item); save(DB.notes, notes); render(); }
+  else if (last.type === 'delete-event') { events.push(last.item); save(DB.events, events); render(); }
+  else if (last.type === 'delete-reminder') { reminders.push(last.item); save(DB.reminders, reminders); render(); }
+  toast(t('restored'));
+}
 
-      osc.type = s.type;
-      osc.frequency.setValueAtTime(s.freq, now);
-      gain.gain.setValueAtTime(0.1, now);
-      gain.gain.exponentialRampToValueAtTime(0.0001, now + s.dur);
-      osc.start(now);
-      osc.stop(now + s.dur);
-    } catch(e) {}
-  };
+let audioCtx = null;
+function beep(freq = 880, dur = 0.15, type = 'sine') {
+  try {
+    if (!audioCtx) audioCtx = new (window.AudioContext || window.webkitAudioContext)();
+    const o = audioCtx.createOscillator();
+    const g = audioCtx.createGain();
+    o.type = type; o.frequency.value = freq;
+    g.gain.value = 0.08;
+    o.connect(g); g.connect(audioCtx.destination);
+    o.start();
+    g.gain.exponentialRampToValueAtTime(0.0001, audioCtx.currentTime + dur);
+    o.stop(audioCtx.currentTime + dur);
+  } catch(e) {}
+}
+function sfxNotif() { beep(880, 0.15); setTimeout(() => beep(1100, 0.2), 150); }
 
-  function playAlert() {
-    playSound('alert');
-    setTimeout(() => playSound('alert'), 500);
-    setTimeout(() => playSound('alert'), 1000);
-  }
-
-  // ==================== 2. اهتزاز ====================
-  function vibrate(pattern = [200, 100, 200]) {
-    if ('vibrate' in navigator) {
-      try { navigator.vibrate(pattern); } catch(e) {}
-    }
-  }
-
-  // ==================== 3. إشعارات ====================
-  function requestNotifPermission() {
-    if (!('Notification' in window)) return;
-    if (Notification.permission === 'default') {
-      Notification.requestPermission();
-    }
-  }
-
-  function sendNotification(title, body) {
-    if ('Notification' in window && Notification.permission === 'granted') {
-      try {
-        new Notification(title, {
-          body: body,
-          icon: 'icon-192.png',
-          badge: 'icon-192.png',
-          vibrate: [200, 100, 200],
-          tag: 'mozakker-' + Date.now()
-        });
-      } catch(e) {}
-    }
-  }
-
-  // ==================== 4. To-Do Renderer ====================
-  window.renderNotePreview = function(note) {
-    if (!note || !note.body) return '';
-
-    const lines = note.body.split('\n');
-    const hasTodos = lines.some(line => {
-      const t = line.trim();
-      return t.startsWith('- [ ]') || t.startsWith('- [x]') || t.startsWith('- [X]');
-    });
-
-    if (!hasTodos) {
-      return escapeHtml(note.body.slice(0, 150));
-    }
-
-    let html = '';
-    let shown = 0;
-
-    lines.forEach((line, idx) => {
-      if (shown >= 8) return;
-      const trimmed = line.trim();
-      const isUnchecked = trimmed.startsWith('- [ ]');
-      const isChecked = trimmed.startsWith('- [x]') || trimmed.startsWith('- [X]');
-
-      if (isUnchecked || isChecked) {
-        const text = trimmed.replace(/^- \[[ xX]\]\s*/, '');
-        const checked = isChecked;
-
-        html += '<div onclick="event.stopPropagation();window.toggleTodo(\'' + note.id + '\',' + idx + ')" '
-          + 'style="display:flex;align-items:center;gap:6px;margin:3px 0;font-size:13px;cursor:pointer;padding:2px 4px;border-radius:4px;transition:background 0.15s" '
-          + 'onmouseover="this.style.background=\'var(--surface-2)\'" '
-          + 'onmouseout="this.style.background=\'transparent\'">'
-          + '<span style="display:inline-flex;align-items:center;justify-content:center;width:16px;height:16px;border-radius:4px;border:2px solid '
-          + (checked ? 'var(--success)' : 'var(--border)') + ';background:'
-          + (checked ? 'var(--success)' : 'transparent')
-          + ';color:#fff;font-size:10px;flex-shrink:0;transition:all 0.15s">'
-          + (checked ? '✓' : '') + '</span>'
-          + '<span style="'
-          + (checked ? 'text-decoration:line-through;opacity:0.6;' : '')
-          + 'overflow:hidden;text-overflow:ellipsis;white-space:nowrap">'
-          + escapeHtml(text) + '</span>'
-          + '</div>';
-        shown++;
-      } else if (trimmed) {
-        html += '<div style="font-size:12px;color:var(--text-muted);margin:2px 0;overflow:hidden;text-overflow:ellipsis;white-space:nowrap">'
-          + escapeHtml(line) + '</div>';
-      }
-    });
-
-    if (lines.length > 8) {
-      html += '<div style="font-size:11px;color:var(--text-muted);margin-top:4px">...</div>';
-    }
-
-    return html;
-  };
-
-  // ==================== 5. To-Do Toggle ====================
-  window.toggleTodo = function(noteId, lineIndex) {
-    try {
-      const notes = JSON.parse(localStorage.getItem('moz_notes') || '[]');
-      const note = notes.find(n => n.id === noteId);
-      if (!note || !note.body) return;
-
-      const lines = note.body.split('\n');
-      const line = lines[lineIndex];
-      if (line === undefined) return;
-
-      const trimmed = line.trim();
-
-      if (trimmed.startsWith('- [ ]')) {
-        lines[lineIndex] = line.replace('- [ ]', '- [x]');
-      } else if (trimmed.startsWith('- [x]') || trimmed.startsWith('- [X]')) {
-        lines[lineIndex] = line.replace(/- \[[xX]\]/, '- [ ]');
-      } else {
-        return;
-      }
-
-      note.body = lines.join('\n');
-      note.updated = Date.now();
-      localStorage.setItem('moz_notes', JSON.stringify(notes));
-
-      playSound('click');
-
-      if (typeof render === 'function') render();
-    } catch(e) {
-      console.error('خطأ في toggleTodo:', e);
-    }
-  };
-
-  // ==================== 6. تصدير PDF ====================
-  window.exportNoteAsPDF = function(noteId) {
-    try {
-      const notes = JSON.parse(localStorage.getItem('moz_notes') || '[]');
-      const note = notes.find(n => n.id === noteId);
-      if (!note) return;
-
-      const html = '<!DOCTYPE html>'
-        + '<html dir="rtl" lang="ar">'
-        + '<head><meta charset="UTF-8"><title>' + (note.title || 'ملاحظة') + '</title>'
-        + '<style>'
-        + 'body { font-family: Arial, sans-serif; padding: 40px; line-height: 1.8; color: #333; }'
-        + 'h1 { color: #4a6cf7; border-bottom: 3px solid #4a6cf7; padding-bottom: 10px; }'
-        + '.meta { color: #888; font-size: 12px; margin-bottom: 20px; }'
-        + '.body { white-space: pre-wrap; font-size: 15px; }'
-        + '.tag { background: #eee; padding: 3px 10px; border-radius: 12px; margin: 3px; display: inline-block; font-size: 12px; }'
-        + '</style></head><body>'
-        + '<h1>' + (note.title || '(بدون عنوان)') + '</h1>'
-        + '<div class="meta">'
-        + (note.importance === 'high' ? '🔴 عالية الأهمية' : note.importance === 'medium' ? '🟠 متوسطة' : '🟢 منخفضة')
-        + ' • ' + new Date(note.updated || Date.now()).toLocaleDateString('ar-EG')
-        + '</div>'
-        + '<div class="body">' + (note.body || '').replace(/</g, '&lt;') + '</div>'
-        + (note.tags && note.tags.length ? '<div>' + note.tags.map(t => '<span class="tag">#' + t + '</span>').join('') + '</div>' : '')
-        + '<hr style="margin-top:40px;border:none;border-top:1px solid #ddd">'
-        + '<p style="text-align:center;color:#aaa;font-size:12px">من تطبيق مُذكّر</p>'
-        + '</body></html>';
-
-      const win = window.open('', '_blank');
-      win.document.write(html);
-      win.document.close();
-      setTimeout(() => { win.print(); }, 500);
-      playSound('success');
-    } catch(e) { alert('خطأ في التصدير'); }
-  };
-
-  // ==================== 7. مشاركة ====================
-  window.shareNote = function(noteId) {
-    try {
-      const notes = JSON.parse(localStorage.getItem('moz_notes') || '[]');
-      const note = notes.find(n => n.id === noteId);
-      if (!note) return;
-      const text = '📝 ' + (note.title || '') + '\n\n' + (note.body || '');
-
-      if (navigator.share) {
-        navigator.share({
-          title: note.title || 'ملاحظة',
-          text: text
-        }).then(() => playSound('success')).catch(() => {});
-      } else {
-        navigator.clipboard.writeText(text).then(() => {
-          playSound('success');
-          alert('✅ تم نسخ الملاحظة!');
-        });
-      }
-    } catch(e) {}
-  };
-
-  // ==================== 8. المزامنة ====================
-  window.syncExport = function() {
-    try {
-      const data = {
-        notes: JSON.parse(localStorage.getItem('moz_notes') || '[]'),
-        events: JSON.parse(localStorage.getItem('moz_events') || '[]'),
-        reminders: JSON.parse(localStorage.getItem('moz_reminders') || '[]'),
-        settings: JSON.parse(localStorage.getItem('moz_settings') || '{}'),
-        exported: new Date().toISOString(),
-        version: 2
-      };
-      const blob = new Blob([JSON.stringify(data, null, 2)], { type: 'application/json' });
-      const url = URL.createObjectURL(blob);
-      const a = document.createElement('a');
-      a.href = url;
-      a.download = 'mozakker-sync-' + new Date().toISOString().split('T')[0] + '.json';
-      a.click();
-      URL.revokeObjectURL(url);
-      playSound('success');
-      alert('✅ تم تصدير البيانات!');
-    } catch(e) { alert('خطأ في التصدير'); }
-  };
-
-  window.syncImport = function() {
-    const input = document.createElement('input');
-    input.type = 'file';
-    input.accept = '.json';
-    input.onchange = (e) => {
-      const file = e.target.files[0];
-      if (!file) return;
-      const reader = new FileReader();
-      reader.onload = (ev) => {
-        try {
-          const data = JSON.parse(ev.target.result);
-          if (data.notes) localStorage.setItem('moz_notes', JSON.stringify(data.notes));
-          if (data.events) localStorage.setItem('moz_events', JSON.stringify(data.events));
-          if (data.reminders) localStorage.setItem('moz_reminders', JSON.stringify(data.reminders));
-          if (data.settings) localStorage.setItem('moz_settings', JSON.stringify(data.settings));
-          playSound('success');
-          alert('✅ تم استيراد البيانات!');
-          location.reload();
-        } catch(err) {
-          playSound('error');
-          alert('❌ الملف تالف');
-        }
-      };
-      reader.readAsText(file);
-    };
-    input.click();
-  };
-
-  // ==================== 9. وضع القراءة ====================
-  window.toggleReadingMode = function() {
-    const isReading = document.body.classList.toggle('reading-mode');
-    localStorage.setItem('moz_reading_mode', isReading ? '1' : '0');
-    playSound('click');
-    return isReading;
-  };
-
-  const readingCSS = document.createElement('style');
-  readingCSS.textContent = `
-    body.reading-mode {
-      background: #f4ecd8 !important;
-      color: #4a3f2e !important;
-      font-size: 18px !important;
-    }
-    body.reading-mode .note-card,
-    body.reading-mode .event-item,
-    body.reading-mode .reminder-item {
-      background: #faf5e6 !important;
-      color: #4a3f2e !important;
-    }
-    body.reading-mode .header {
-      background: #ede4cc !important;
-    }
-  `;
-  document.head.appendChild(readingCSS);
-
-  // ==================== 10. التذكيرات الذكية ====================
-  function checkSmartReminders() {
-    try {
-      const notes = JSON.parse(localStorage.getItem('moz_notes') || '[]');
-      const now = Date.now();
-      const threeDaysAgo = now - (3 * 24 * 60 * 60 * 1000);
-      const oldNotes = notes.filter(n =>
-        n.importance === 'high' &&
-        !n.pinned &&
-        (n.updated || n.created) < threeDaysAgo
-      );
-      if (oldNotes.length > 0) {
-        const randomNote = oldNotes[Math.floor(Math.random() * oldNotes.length)];
-        sendNotification('⏰ تذكير: ملاحظة مهمة', 'لسه ما خلصتش: "' + randomNote.title + '"');
-      }
-    } catch(e) {}
-  }
-
-  // ==================== مراقبة الوقت ====================
-  setInterval(() => {
-    try {
-      const now = new Date();
-      const nowTime = String(now.getHours()).padStart(2, '0') + ':' + String(now.getMinutes()).padStart(2, '0');
-      const today = now.toISOString().split('T')[0];
-
-      const reminders = JSON.parse(localStorage.getItem('moz_reminders') || '[]');
-      reminders.forEach(r => {
-        if (!r.enabled) return;
-        if (r.time !== nowTime) return;
-        const key = 'smart_reminder_' + r.id + '_' + today;
-        if (sessionStorage.getItem(key)) return;
-        sessionStorage.setItem(key, '1');
-        playAlert();
-        vibrate([300, 150, 300, 150, 300]);
-        sendNotification('⏰ حان وقت التنبيه', r.title);
-      });
-
-      const events = JSON.parse(localStorage.getItem('moz_events') || '[]');
-      events.forEach(e => {
-        if (!e.remind || !e.time) return;
-        if (e.date !== today) return;
-        const [h, m] = e.time.split(':').map(Number);
-        const evDate = new Date();
-        evDate.setHours(h, m, 0, 0);
-        const diff = (evDate - now) / 60000;
-        const key = 'smart_event_' + e.id + '_' + today;
-        if (diff > 0 && diff <= e.remind && !sessionStorage.getItem(key)) {
-          sessionStorage.setItem(key, '1');
-          playAlert();
-          vibrate([300, 150, 300]);
-          sendNotification('🔔 موعدك قريب', e.title);
-        }
-      });
-    } catch(e) {}
-  }, 30000);
-
-  setInterval(checkSmartReminders, 60 * 60 * 1000);
-
-  // ==================== إضافة أزرار ====================
-  window.addEventListener('load', () => {
-    setTimeout(() => {
-      if (localStorage.getItem('moz_reading_mode') === '1') {
-        document.body.classList.add('reading-mode');
-      }
-
-      if ('Notification' in window && Notification.permission === 'default') {
-        setTimeout(requestNotifPermission, 3000);
-      }
-
-      const header = document.querySelector('.header');
-      if (header && !document.getElementById('readingModeBtn')) {
-        const btn = document.createElement('button');
-        btn.id = 'readingModeBtn';
-        btn.className = 'icon-btn';
-        btn.title = 'وضع القراءة';
-        btn.innerHTML = '<span style="font-size:18px">📖</span>';
-        btn.onclick = () => {
-          const active = toggleReadingMode();
-          btn.style.background = active ? 'var(--primary)' : '';
-          btn.style.color = active ? '#fff' : '';
-        };
-        if (localStorage.getItem('moz_reading_mode') === '1') {
-          btn.style.background = 'var(--primary)';
-          btn.style.color = '#fff';
-        }
-        header.appendChild(btn);
-      }
-
-      if (header && !document.getElementById('syncBtn')) {
-        const btn = document.createElement('button');
-        btn.id = 'syncBtn';
-        btn.className = 'icon-btn';
-        btn.title = 'مزامنة';
-        btn.innerHTML = '<span style="font-size:18px">🔄</span>';
-        btn.onclick = () => {
-          const choice = confirm('OK للتصدير (نسخة احتياطية)\nCancel للاستيراد (استرجاع)');
-          if (choice) syncExport();
-          else syncImport();
-        };
-        header.appendChild(btn);
-      }
-
-      console.log('%c🚀 Mozakker Features Loaded!', 'color:#10b981;font-weight:bold;font-size:14px');
-      console.log('✅ 10 مميزات شغالة + To-Do تفاعلي');
-    }, 1000);
+function requestNotif() {
+  if (!('Notification' in window)) return;
+  if (Notification.permission === 'granted') { toast(t('notifGranted'), 'success'); return; }
+  if (Notification.permission === 'denied') { toast(t('notifDenied'), 'error'); return; }
+  Notification.requestPermission().then(p => {
+    if (p === 'granted') toast(t('notifGranted'), 'success');
+    else toast(t('notifDenied'), 'error');
   });
+}
+function showNotif(title, body) {
+  if ('Notification' in window && Notification.permission === 'granted') {
+    try { new Notification(title, { body }); } catch(e) {}
+  }
+}
 
-})();
+function applyTheme() {
+  const root = document.documentElement;
+  root.setAttribute('data-theme', settings.theme === 'dark' ? 'dark' : '');
+  root.style.setProperty('--primary', settings.primary);
+  root.style.setProperty('--bg', settings.bg);
+  root.style.setProperty('--text', settings.text);
+  root.style.setProperty('--font-size', settings.fontSize + 'px');
+  root.style.setProperty('--wallpaper', settings.wallpaper ? `url('${settings.wallpaper}')` : 'none');
+  root.style.setProperty('--wallpaper-overlay', settings.wallpaper ? 'block' : 'none');
+}
+function setThemePreset(name) {
+  const presets = {
+    light: { theme: 'light', primary: '#4a6cf7', bg: '#f5f7fb', text: '#1a1a2e' },
+    dark: { theme: 'dark', primary: '#6366f1', bg: '#0f1220', text: '#e8ecf7' },
+    blue: { theme: 'light', primary: '#0ea5e9', bg: '#f0f9ff', text: '#0c4a6e' },
+    green: { theme: 'light', primary: '#10b981', bg: '#f0fdf4', text: '#064e3b' },
+    purple: { theme: 'light', primary: '#8b5cf6', bg: '#faf5ff', text: '#4c1d95' },
+    orange: { theme: 'light', primary: '#f97316', bg: '#fff7ed', text: '#7c2d12' },
+    pink: { theme: 'light', primary: '#ec4899', bg: '#fdf2f8', text: '#831843' },
+    teal: { theme: 'light', primary: '#14b8a6', bg: '#f0fdfa', text: '#134e4a' },
+  };
+  const p = presets[name] || presets.light;
+  Object.assign(settings, p);
+  save(DB.settings, settings);
+  applyTheme();
+  toast('🎨 ' + name, 'success');
+  openSettings();
+}
+
+let currentTab = 'notes';
+let currentDate = new Date();
+let searchQuery = '';
+let editingId = null;
+
+function render() {
+  const main = document.getElementById('main');
+  const q = searchQuery.trim().toLowerCase();
+  document.getElementById('notesBadge').textContent = notes.length;
+  document.getElementById('eventsBadge').textContent = events.length;
+  document.getElementById('remindersBadge').textContent = reminders.length;
+  if (currentTab === 'notes') main.innerHTML = renderNotes(q);
+  else if (currentTab === 'events') main.innerHTML = renderEvents(q);
+  else if (currentTab === 'reminders') main.innerHTML = renderReminders(q);
+  else if (currentTab === 'today') main.innerHTML = renderToday();
+  else if (currentTab === 'stats') main.innerHTML = renderStats();
+  document.querySelectorAll('.tab').forEach(tb => tb.classList.toggle('active', tb.dataset.tab === currentTab));
+}
+
+function renderNotes(q) {
+  let list = notes.slice();
+  if (q) list = list.filter(n => (n.title + ' ' + n.body + ' ' + (n.tags||[]).join(' ')).toLowerCase().includes(q));
+  list.sort((a, b) => {
+    if (a.pinned && !b.pinned) return -1;
+    if (!a.pinned && b.pinned) return 1;
+    return (b.updated || 0) - (a.updated || 0);
+  });
+  if (list.length === 0) {
+    return `<div class="empty"><div class="icon">📝</div><h3>${q ? t('noSearch') : t('noNotes')}</h3><p>${q ? '' : t('noNotesHint')}</p></div>`;
+  }
+  return `<div class="notes-grid">${list.map(n => {
+    const tags = (n.tags || []).map(tg => `<span class="tag">#${escapeHtml(tg)}</span>`).join('');
+    return `<div class="note-card ${n.pinned?'pinned':''}" data-importance="${n.importance || 'low'}" onclick="editNote('${n.id}')">
+      <h3>${escapeHtml(n.title || '(بدون عنوان)')}</h3>
+      <div class="preview">${escapeHtml((n.body || '').slice(0, 150))}</div>
+      <div class="meta">
+        <div class="tags">${tags}</div>
+        <div class="actions" onclick="event.stopPropagation()">
+          <button onclick="togglePin('${n.id}')">${n.pinned?'📌':'📍'}</button>
+          <button onclick="copyNote('${n.id}')">📋</button>
+          <button onclick="deleteNote('${n.id}')">🗑️</button>
+        </div>
+      </div>
+    </div>`;
+  }).join('')}</div>`;
+}
+
+function renderEvents(q) {
+  const y = currentDate.getFullYear(), m = currentDate.getMonth();
+  const first = new Date(y, m, 1);
+  const last = new Date(y, m + 1, 0);
+  const startDay = first.getDay();
+  const daysInMonth = last.getDate();
+  const today = fmtDate(new Date());
+  const monthNames = LANG === 'ar'
+    ? ['يناير','فبراير','مارس','أبريل','مايو','يونيو','يوليو','أغسطس','سبتمبر','أكتوبر','نوفمبر','ديسمبر']
+    : ['January','February','March','April','May','June','July','August','September','October','November','December'];
+  const dayNames = LANG === 'ar'
+    ? ['أحد','إثنين','ثلاثاء','أربعاء','خميس','جمعة','سبت']
+    : ['Sun','Mon','Tue','Wed','Thu','Fri','Sat'];
+  let calHtml = `<div class="cal-header">
+    <button class="icon-btn" onclick="changeMonth(-1)">‹</button>
+    <div class="cal-title">${monthNames[m]} ${y}</div>
+    <button class="icon-btn" onclick="changeMonth(1)">›</button>
+  </div><div class="cal-grid">`;
+  dayNames.forEach(d => calHtml += `<div class="cal-day-name">${d}</div>`);
+  for (let i = startDay - 1; i >= 0; i--) {
+    const d = new Date(y, m, -i);
+    calHtml += `<div class="cal-day other-month">${d.getDate()}</div>`;
+  }
+  for (let d = 1; d <= daysInMonth; d++) {
+    const dateStr = `${y}-${pad(m+1)}-${pad(d)}`;
+    const dayEvents = events.filter(e => e.date === dateStr);
+    const isToday = dateStr === today;
+    const isSelected = dateStr === fmtDate(currentDate);
+    const dots = dayEvents.slice(0, 3).map(e => `<span class="dot ${e.importance || 'low'}"></span>`).join('');
+    calHtml += `<div class="cal-day ${isToday?'today':''} ${isSelected && !isToday?'selected':''}" onclick="selectDay(${y},${m},${d})">${d}<div class="dots">${dots}</div></div>`;
+  }
+  const remaining = 42 - (startDay + daysInMonth);
+  for (let i = 1; i <= remaining; i++) calHtml += `<div class="cal-day other-month">${i}</div>`;
+  calHtml += `</div>`;
+  const selDate = fmtDate(currentDate);
+  let dayList = events.filter(e => e.date === selDate);
+  if (q) dayList = dayList.filter(e => (e.title + ' ' + (e.desc||'') + ' ' + (e.location||'')).toLowerCase().includes(q));
+  dayList.sort((a, b) => (a.time || '').localeCompare(b.time || ''));
+  let listHtml = `<h3 class="mt-2 mb-1" style="font-size:15px">📅 ${selDate}</h3>`;
+  if (dayList.length === 0) listHtml += `<div class="empty" style="padding:30px"><p>${t('noEvents')}</p></div>`;
+  else listHtml += dayList.map(e => `
+    <div class="event-item" data-importance="${e.importance || 'low'}" onclick="editEvent('${e.id}')">
+      <div class="event-time">${e.time || ''}</div>
+      <div class="event-body"><h4>${escapeHtml(e.title)}</h4>${e.desc ? `<p>${escapeHtml(e.desc.slice(0, 80))}</p>` : ''}${e.location ? `<p>📍 ${escapeHtml(e.location)}</p>` : ''}</div>
+      <button class="icon-btn" onclick="event.stopPropagation();deleteEvent('${e.id}')">🗑️</button>
+    </div>`).join('');
+  return calHtml + listHtml;
+}
+
+function renderReminders(q) {
+  let list = reminders.slice();
+  if (q) list = list.filter(r => r.title.toLowerCase().includes(q));
+  list.sort((a, b) => (a.time || '').localeCompare(b.time || ''));
+  if (list.length === 0) return `<div class="empty"><div class="icon">🔔</div><h3>${t('noReminders')}</h3><p>${t('noRemindersHint')}</p></div>`;
+  return list.map(r => `
+    <div class="reminder-item ${r.enabled ? '' : 'off'}">
+      <div class="reminder-icon">🔔</div>
+      <div class="reminder-info"><h4>${escapeHtml(r.title)}</h4><p>${r.time} ${r.daily ? '• ' + t('daily') : ''} ${r.weekly ? '• ' + t('weekly') : ''}</p></div>
+      <div class="switch ${r.enabled ? 'on' : ''}" onclick="toggleReminder('${r.id}')"></div>
+      <button class="icon-btn" onclick="editReminder('${r.id}')">✏️</button>
+      <button class="icon-btn" onclick="deleteReminder('${r.id}')">🗑️</button>
+    </div>`).join('');
+}
+
+function renderToday() {
+  const today = fmtDate(new Date());
+  const todayEvents = events.filter(e => e.date === today).sort((a,b) => (a.time||'').localeCompare(b.time||''));
+  const todayReminders = reminders.filter(r => r.enabled);
+  const importantNotes = notes.filter(n => n.importance === 'high' || n.pinned).slice(0, 6);
+  let html = '';
+  html += `<h3 class="mb-1" style="font-size:15px">📅 ${t('todayEvents')}</h3>`;
+  if (todayEvents.length === 0) html += `<div class="empty" style="padding:20px"><p>${t('noToday')}</p></div>`;
+  else html += todayEvents.map(e => `<div class="event-item" data-importance="${e.importance || 'low'}" onclick="editEvent('${e.id}')"><div class="event-time">${e.time || ''}</div><div class="event-body"><h4>${escapeHtml(e.title)}</h4>${e.desc ? `<p>${escapeHtml(e.desc.slice(0,60))}</p>` : ''}</div></div>`).join('');
+  html += `<h3 class="mt-2 mb-1" style="font-size:15px">🔔 ${t('todayReminders')}</h3>`;
+  if (todayReminders.length === 0) html += `<div class="empty" style="padding:20px"><p>${t('noToday')}</p></div>`;
+  else html += todayReminders.map(r => `<div class="reminder-item"><div class="reminder-icon">🔔</div><div class="reminder-info"><h4>${escapeHtml(r.title)}</h4><p>${r.time}</p></div></div>`).join('');
+  html += `<h3 class="mt-2 mb-1" style="font-size:15px">⭐ ${t('todayNotes')}</h3>`;
+  if (importantNotes.length === 0) html += `<div class="empty" style="padding:20px"><p>${t('noToday')}</p></div>`;
+  else html += `<div class="notes-grid">${importantNotes.map(n => `<div class="note-card ${n.pinned?'pinned':''}" data-importance="${n.importance || 'low'}" onclick="editNote('${n.id}')"><h3>${escapeHtml(n.title || '(بدون عنوان)')}</h3><div class="preview">${escapeHtml((n.body||'').slice(0,80))}</div></div>`).join('')}</div>`;
+  return html;
+}
+
+function renderStats() {
+  const total = notes.length + events.length + reminders.length;
+  const highNotes = notes.filter(n => n.importance === 'high').length;
+  const weekAgo = Date.now() - 7 * 24 * 60 * 60 * 1000;
+  const thisWeek = notes.filter(n => (n.created || 0) > weekAgo).length + events.filter(e => (e.created || 0) > weekAgo).length;
+  return `
+    <div class="stats-grid">
+      <div class="stat-card"><div class="num">${notes.length}</div><div class="lbl">${t('totalNotes')}</div></div>
+      <div class="stat-card"><div class="num">${events.length}</div><div class="lbl">${t('totalEvents')}</div></div>
+      <div class="stat-card"><div class="num">${reminders.length}</div><div class="lbl">${t('totalReminders')}</div></div>
+      <div class="stat-card"><div class="num" style="color:var(--danger)">${highNotes}</div><div class="lbl">${t('highImportance')}</div></div>
+      <div class="stat-card"><div class="num">${thisWeek}</div><div class="lbl">${t('thisWeek')}</div></div>
+      <div class="stat-card"><div class="num">${total}</div><div class="lbl">Total</div></div>
+    </div>
+    <div class="settings-section mt-2">
+      <h3>💾 ${t('data')}</h3>
+      <button class="btn block" onclick="exportData()">📤 ${t('export')}</button>
+      <label class="btn block mt-1" style="cursor:pointer">📥 ${t('import')}<input type="file" accept=".json" onchange="importData(event)" style="display:none"></label>
+      <button class="btn danger block mt-1" onclick="clearAll()">🗑️ ${t('clearAll')}</button>
+    </div>
+    <div class="settings-section">
+      <h3>🔔 ${t('allowNotif')}</h3>
+      <button class="btn block" onclick="requestNotif()">${('Notification' in window && Notification.permission === 'granted') ? t('notifGranted') : t('notifDefault')}</button>
+    </div>`;
+}
+
+function openNoteModal(id) {
+  editingId = id || null;
+  const n = id ? notes.find(x => x.id === id) : { title:'', body:'', importance:'low', tags:[], pinned:false };
+  document.getElementById('modalBox').innerHTML = `
+    <div class="modal-header"><h2>${id ? t('editNote') : t('addNote')}</h2><button class="close-x" onclick="closeModal()">✕</button></div>
+    <div class="modal-body">
+      <div class="form-group"><label>${t('noteTitle')}</label><input type="text" id="noteTitle" value="${escapeHtml(n.title)}"></div>
+      <div class="form-group"><label>${t('noteBody')}</label><textarea id="noteBody">${escapeHtml(n.body)}</textarea></div>
+      <div class="form-group"><label>${t('importance')}</label>
+        <div class="importance-row">
+          <button type="button" class="importance-btn" data-value="high" onclick="setImportance('high')">🔴 ${t('high')}</button>
+          <button type="button" class="importance-btn" data-value="medium" onclick="setImportance('medium')">🟠 ${t('medium')}</button>
+          <button type="button" class="importance-btn" data-value="low" onclick="setImportance('low')">🟢 ${t('low')}</button>
+        </div>
+      </div>
+      <div class="form-group"><label>${t('tags')}</label><input type="text" id="noteTags" value="${escapeHtml((n.tags || []).join(', '))}"></div>
+    </div>
+    <div class="modal-footer"><button class="btn ghost" onclick="closeModal()">${t('cancel')}</button><button class="btn primary" onclick="saveNote()">${t('save')}</button></div>`;
+  setImportance(n.importance || 'low');
+  showModal();
+}
+function setImportance(v) {
+  document.querySelectorAll('.importance-btn').forEach(b => b.classList.toggle('active', b.dataset.value === v));
+}
+function getImportance() {
+  const btn = document.querySelector('.importance-btn.active');
+  return btn ? btn.dataset.value : 'low';
+}
+function saveNote() {
+  const title = document.getElementById('noteTitle').value.trim();
+  const body = document.getElementById('noteBody').value.trim();
+  const importance = getImportance();
+  const tags = document.getElementById('noteTags').value.split(',').map(s => s.trim()).filter(Boolean);
+  if (!title && !body) { toast('اكتب حاجة الأول', 'error'); return; }
+  if (editingId) {
+    const n = notes.find(x => x.id === editingId);
+    Object.assign(n, { title, body, importance, tags, updated: Date.now() });
+    toast(t('noteUpdated'), 'success');
+  } else {
+    notes.push({ id: uid(), title, body, importance, tags, pinned: false, created: Date.now(), updated: Date.now() });
+    toast(t('noteAdded'), 'success');
+  }
+  save(DB.notes, notes);
+  closeModal();
+  render();
+  beep(700, 0.08);
+}
+function editNote(id) { openNoteModal(id); }
+function deleteNote(id) {
+  if (!confirm(t('deleteConfirm'))) return;
+  const item = notes.find(x => x.id === id);
+  pushUndo({ type: 'delete-note', item });
+  notes = notes.filter(x => x.id !== id);
+  save(DB.notes, notes);
+  render();
+  toast(t('deleted'), 'error');
+}
+function togglePin(id) {
+  const n = notes.find(x => x.id === id);
+  n.pinned = !n.pinned;
+  n.updated = Date.now();
+  save(DB.notes, notes);
+  render();
+}
+function copyNote(id) {
+  const n = notes.find(x => x.id === id);
+  navigator.clipboard.writeText(`${n.title}\n\n${n.body}`).then(() => toast(t('copied'), 'success'));
+}
+
+function openEventModal(id) {
+  editingId = id || null;
+  const e = id ? events.find(x => x.id === id) : { title:'', desc:'', date: fmtDate(currentDate), time:'', location:'', importance:'low', remind:0, repeat:'none' };
+  document.getElementById('modalBox').innerHTML = `
+    <div class="modal-header"><h2>${id ? t('editEvent') : t('addEvent')}</h2><button class="close-x" onclick="closeModal()">✕</button></div>
+    <div class="modal-body">
+      <div class="form-group"><label>${t('eventTitle')}</label><input type="text" id="evTitle" value="${escapeHtml(e.title)}"></div>
+      <div class="form-group"><label>${t('eventDesc')}</label><textarea id="evDesc" style="min-height:60px">${escapeHtml(e.desc)}</textarea></div>
+      <div class="row">
+        <div class="form-group grow"><label>${t('selectDate')}</label><input type="date" id="evDate" value="${e.date}"></div>
+        <div class="form-group grow"><label>${t('startTime')}</label><input type="time" id="evTime" value="${e.time}"></div>
+      </div>
+      <div class="form-group"><label>${t('location')}</label><input type="text" id="evLocation" value="${escapeHtml(e.location)}"></div>
+      <div class="form-group"><label>${t('importance')}</label>
+        <div class="importance-row">
+          <button type="button" class="importance-btn" data-value="high" onclick="setImportance('high')">🔴 ${t('high')}</button>
+          <button type="button" class="importance-btn" data-value="medium" onclick="setImportance('medium')">🟠 ${t('medium')}</button>
+          <button type="button" class="importance-btn" data-value="low" onclick="setImportance('low')">🟢 ${t('low')}</button>
+        </div>
+      </div>
+      <div class="form-group"><label>${t('repeat')}</label>
+        <select id="evRepeat">
+          <option value="none" ${e.repeat==='none'?'selected':''}>${t('none')}</option>
+          <option value="daily" ${e.repeat==='daily'?'selected':''}>${t('daily')}</option>
+          <option value="weekly" ${e.repeat==='weekly'?'selected':''}>${t('weekly')}</option>
+          <option value="monthly" ${e.repeat==='monthly'?'selected':''}>${t('monthly')}</option>
+          <option value="yearly" ${e.repeat==='yearly'?'selected':''}>${t('yearly')}</option>
+        </select>
+      </div>
+      <div class="form-group"><label>${t('remindBefore')}</label>
+        <select id="evRemind">
+          <option value="0" ${e.remind==0?'selected':''}>${t('none')}</option>
+          <option value="5" ${e.remind==5?'selected':''}>5 ${t('minutes')}</option>
+          <option value="15" ${e.remind==15?'selected':''}>15 ${t('minutes')}</option>
+          <option value="30" ${e.remind==30?'selected':''}>30 ${t('minutes')}</option>
+          <option value="60" ${e.remind==60?'selected':''}>1 ${t('hours')}</option>
+        </select>
+      </div>
+    </div>
+    <div class="modal-footer"><button class="btn ghost" onclick="closeModal()">${t('cancel')}</button><button class="btn primary" onclick="saveEvent()">${t('save')}</button></div>`;
+  setImportance(e.importance || 'low');
+  showModal();
+}
+function saveEvent() {
+  const title = document.getElementById('evTitle').value.trim();
+  const desc = document.getElementById('evDesc').value.trim();
+  const date = document.getElementById('evDate').value;
+  const time = document.getElementById('evTime').value;
+  const location = document.getElementById('evLocation').value.trim();
+  const importance = getImportance();
+  const repeat = document.getElementById('evRepeat').value;
+  const remind = parseInt(document.getElementById('evRemind').value) || 0;
+  if (!title) { toast('اكتب العنوان', 'error'); return; }
+  if (!date) { toast('اختر التاريخ', 'error'); return; }
+  if (editingId) {
+    const e = events.find(x => x.id === editingId);
+    Object.assign(e, { title, desc, date, time, location, importance, repeat, remind, updated: Date.now() });
+    toast(t('eventUpdated'), 'success');
+  } else {
+    events.push({ id: uid(), title, desc, date, time, location, importance, repeat, remind, created: Date.now(), updated: Date.now() });
+    toast(t('eventAdded'), 'success');
+  }
+  save(DB.events, events);
+  closeModal();
+  render();
+  beep(700, 0.08);
+}
+function editEvent(id) { openEventModal(id); }
+function deleteEvent(id) {
+  if (!confirm(t('deleteConfirm'))) return;
+  const item = events.find(x => x.id === id);
+  pushUndo({ type: 'delete-event', item });
+  events = events.filter(x => x.id !== id);
+  save(DB.events, events);
+  render();
+  toast(t('deleted'), 'error');
+}
+function changeMonth(d) { currentDate.setMonth(currentDate.getMonth() + d); render(); }
+function selectDay(y, m, d) { currentDate = new Date(y, m, d); render(); }
+
+function openReminderModal(id) {
+  editingId = id || null;
+  const r = id ? reminders.find(x => x.id === id) : { title:'', time:'09:00', daily:false, weekly:false, enabled:true };
+  document.getElementById('modalBox').innerHTML = `
+    <div class="modal-header"><h2>${t('addReminder')}</h2><button class="close-x" onclick="closeModal()">✕</button></div>
+    <div class="modal-body">
+      <div class="form-group"><label>${t('reminderTitle')}</label><input type="text" id="rmTitle" value="${escapeHtml(r.title)}"></div>
+      <div class="form-group"><label>${t('reminderTime')}</label><input type="time" id="rmTime" value="${r.time}"></div>
+      <div class="form-group"><label>${t('repeat')}</label>
+        <div class="row"><label class="row" style="gap:6px"><input type="checkbox" id="rmDaily" ${r.daily?'checked':''}> ${t('repeatDaily')}</label></div>
+        <div class="row mt-1"><label class="row" style="gap:6px"><input type="checkbox" id="rmWeekly" ${r.weekly?'checked':''}> ${t('repeatWeekly')}</label></div>
+      </div>
+    </div>
+    <div class="modal-footer"><button class="btn ghost" onclick="closeModal()">${t('cancel')}</button><button class="btn primary" onclick="saveReminder()">${t('save')}</button></div>`;
+  showModal();
+}
+function saveReminder() {
+  const title = document.getElementById('rmTitle').value.trim();
+  const time = document.getElementById('rmTime').value;
+  const daily = document.getElementById('rmDaily').checked;
+  const weekly = document.getElementById('rmWeekly').checked;
+  if (!title || !time) { toast('اكتب العنوان والوقت', 'error'); return; }
+  if (editingId) {
+    const r = reminders.find(x => x.id === editingId);
+    Object.assign(r, { title, time, daily, weekly, updated: Date.now() });
+    toast(t('reminderUpdated'), 'success');
+  } else {
+    reminders.push({ id: uid(), title, time, daily, weekly, enabled: true, created: Date.now(), updated: Date.now() });
+    toast(t('reminderAdded'), 'success');
+  }
+  save(DB.reminders, reminders);
+  closeModal();
+  render();
+  beep(700, 0.08);
+}
+function editReminder(id) { openReminderModal(id); }
+function deleteReminder(id) {
+  if (!confirm(t('deleteConfirm'))) return;
+  const item = reminders.find(x => x.id === id);
+  pushUndo({ type: 'delete-reminder', item });
+  reminders = reminders.filter(x => x.id !== id);
+  save(DB.reminders, reminders);
+  render();
+  toast(t('deleted'), 'error');
+}
+function toggleReminder(id) {
+  const r = reminders.find(x => x.id === id);
+  r.enabled = !r.enabled;
+  save(DB.reminders, reminders);
+  render();
+  beep(r.enabled ? 800 : 400, 0.08);
+}
+
+function showModal() { document.getElementById('modal').classList.add('show'); }
+function closeModal() { document.getElementById('modal').classList.remove('show'); editingId = null; }
+document.getElementById('modal').addEventListener('click', e => { if (e.target.id === 'modal') closeModal(); });
+
+function openSettings() {
+  document.getElementById('modalBox').innerHTML = `
+    <div class="modal-header"><h2>⚙️ ${t('settings')}</h2><button class="close-x" onclick="closeModal()">✕</button></div>
+    <div class="modal-body">
+      <div class="settings-section">
+        <h3>🎨 ${t('themePresets')}</h3>
+        <div class="theme-grid">
+          <button class="theme-btn" style="background:linear-gradient(135deg,#f5f7fb,#4a6cf7);color:#4a6cf7" onclick="setThemePreset('light')">Light</button>
+          <button class="theme-btn" style="background:linear-gradient(135deg,#0f1220,#6366f1);color:#fff" onclick="setThemePreset('dark')">Dark</button>
+          <button class="theme-btn" style="background:linear-gradient(135deg,#f0f9ff,#0ea5e9);color:#0ea5e9" onclick="setThemePreset('blue')">Blue</button>
+          <button class="theme-btn" style="background:linear-gradient(135deg,#f0fdf4,#10b981);color:#10b981" onclick="setThemePreset('green')">Green</button>
+          <button class="theme-btn" style="background:linear-gradient(135deg,#faf5ff,#8b5cf6);color:#8b5cf6" onclick="setThemePreset('purple')">Purple</button>
+          <button class="theme-btn" style="background:linear-gradient(135deg,#fff7ed,#f97316);color:#f97316" onclick="setThemePreset('orange')">Orange</button>
+          <button class="theme-btn" style="background:linear-gradient(135deg,#fdf2f8,#ec4899);color:#ec4899" onclick="setThemePreset('pink')">Pink</button>
+          <button class="theme-btn" style="background:linear-gradient(135deg,#f0fdfa,#14b8a6);color:#14b8a6" onclick="setThemePreset('teal')">Teal</button>
+        </div>
+      </div>
+      <div class="settings-section">
+        <h3>🎨 ${t('customColors')}</h3>
+        <div class="color-picker-row"><label>${t('primaryColor')}</label><input type="color" value="${settings.primary}" onchange="updateColor('primary',this.value)"></div>
+        <div class="color-picker-row"><label>${t('bgColor')}</label><input type="color" value="${settings.bg}" onchange="updateColor('bg',this.value)"></div>
+        <div class="color-picker-row"><label>${t('textColor')}</label><input type="color" value="${settings.text}" onchange="updateColor('text',this.value)"></div>
+      </div>
+      <div class="settings-section">
+        <h3>🖼️ ${t('wallpaper')}</h3>
+        <div class="form-group"><input type="text" value="${escapeHtml(settings.wallpaper)}" placeholder="https://..." onchange="updateWallpaper(this.value)"></div>
+        <button class="btn block mt-1" onclick="updateWallpaper('')">🗑️ Clear</button>
+      </div>
+      <div class="settings-section">
+        <h3>📝 ${t('fontSize')}</h3>
+        <div class="row">
+          <button class="btn ${settings.fontSize===13?'primary':''}" onclick="updateFontSize(13)">${t('small')}</button>
+          <button class="btn ${settings.fontSize===15?'primary':''}" onclick="updateFontSize(15)">${t('normal')}</button>
+          <button class="btn ${settings.fontSize===18?'primary':''}" onclick="updateFontSize(18)">${t('large')}</button>
+        </div>
+      </div>
+      <div class="settings-section">
+        <h3>🌐 ${t('language')}</h3>
+        <div class="row">
+          <button class="btn ${LANG==='ar'?'primary':''}" onclick="setLang('ar')">${t('arabic')}</button>
+          <button class="btn ${LANG==='en'?'primary':''}" onclick="setLang('en')">${t('english')}</button>
+        </div>
+      </div>
+      <div class="settings-section">
+        <h3>🔔 ${t('allowNotif')}</h3>
+        <button class="btn block" onclick="requestNotif()">${('Notification' in window && Notification.permission === 'granted') ? t('notifGranted') : t('notifDefault')}</button>
+      </div>
+      <div class="settings-section">
+        <h3>💾 ${t('data')}</h3>
+        <button class="btn block" onclick="exportData()">📤 ${t('export')}</button>
+        <label class="btn block mt-1" style="cursor:pointer">📥 ${t('import')}<input type="file" accept=".json" onchange="importData(event)" style="display:none"></label>
+        <button class="btn danger block mt-1" onclick="clearAll()">🗑️ ${t('clearAll')}</button>
+      </div>
+    </div>
+    <div class="modal-footer"><button class="btn primary block" onclick="closeModal()">${t('close')}</button></div>`;
+  showModal();
+}
+function updateColor(key, val) {
+  settings[key] = val;
+  if (key === 'bg' && settings.theme === 'dark') settings.theme = 'light';
+  save(DB.settings, settings);
+  applyTheme();
+}
+function updateWallpaper(url) { settings.wallpaper = url; save(DB.settings, settings); applyTheme(); }
+function updateFontSize(size) { settings.fontSize = size; save(DB.settings, settings); applyTheme(); openSettings(); }
+function setLang(lang) {
+  LANG = lang;
+  localStorage.setItem('moz_lang', lang);
+  applyI18n();
+  openSettings();
+  render();
+}
+
+function exportData() {
+  const data = { notes, events, reminders, settings, exported: new Date().toISOString(), version: 1 };
+  const blob = new Blob([JSON.stringify(data, null, 2)], { type: 'application/json' });
+  const url = URL.createObjectURL(blob);
+  const a = document.createElement('a');
+  a.href = url;
+  a.download = `mozakker-backup-${fmtDate(new Date())}.json`;
+  a.click();
+  URL.revokeObjectURL(url);
+  toast('📤 ' + t('saved'), 'success');
+}
+function importData(ev) {
+  const file = ev.target.files[0];
+  if (!file) return;
+  const reader = new FileReader();
+  reader.onload = (e) => {
+    try {
+      const data = JSON.parse(e.target.result);
+      if (data.notes) notes = data.notes;
+      if (data.events) events = data.events;
+      if (data.reminders) reminders = data.reminders;
+      if (data.settings) settings = data.settings;
+      save(DB.notes, notes); save(DB.events, events);
+      save(DB.reminders, reminders); save(DB.settings, settings);
+      applyTheme();
+      render();
+      toast('📥 ' + t('saved'), 'success');
+      closeModal();
+    } catch(err) { toast('❌ Invalid file', 'error'); }
+  };
+  reader.readAsText(file);
+}
+function clearAll() {
+  if (!confirm(t('clearAllConfirm'))) return;
+  notes = []; events = []; reminders = [];
+  save(DB.notes, notes); save(DB.events, events); save(DB.reminders, reminders);
+  render();
+  closeModal();
+  toast(t('deleted'), 'error');
+}
+
+document.getElementById('globalSearch').addEventListener('input', e => { searchQuery = e.target.value; render(); });
+document.querySelectorAll('.tab').forEach(tb => {
+  tb.addEventListener('click', () => {
+    currentTab = tb.dataset.tab;
+    render();
+    beep(600, 0.05);
+  });
+});
+
+document.getElementById('fab').addEventListener('click', () => {
+  if (currentTab === 'notes') openNoteModal();
+  else if (currentTab === 'events') openEventModal();
+  else if (currentTab === 'reminders') openReminderModal();
+  else openNoteModal();
+});
+
+document.getElementById('settingsBtn').addEventListener('click', openSettings);
+document.getElementById('langToggle').addEventListener('click', () => setLang(LANG === 'ar' ? 'en' : 'ar'));
+document.getElementById('themeToggle').addEventListener('click', () => {
+  settings.theme = settings.theme === 'dark' ? 'light' : 'dark';
+  if (settings.theme === 'light') { settings.bg = '#f5f7fb'; settings.text = '#1a1a2e'; }
+  else { settings.bg = '#0f1220'; settings.text = '#e8ecf7'; }
+  save(DB.settings, settings);
+  applyTheme();
+  beep(700, 0.08);
+});
+
+document.addEventListener('keydown', e => {
+  if (e.ctrlKey || e.metaKey) {
+    if (e.key === 'n') { e.preventDefault(); openNoteModal(); }
+    if (e.key === 's') { e.preventDefault(); toast('✅ ' + t('saved'), 'success'); }
+    if (e.key === 'f') { e.preventDefault(); document.getElementById('globalSearch').focus(); }
+    if (e.key === 'z') { e.preventDefault(); undo(); }
+  }
+  if (e.key === 'Escape') closeModal();
+});
+
+let firedReminders = {};
+function checkReminders() {
+  const now = new Date();
+  const nowTime = pad(now.getHours()) + ':' + pad(now.getMinutes());
+  reminders.forEach(r => {
+    if (!r.enabled) return;
+    if (r.time !== nowTime) return;
+    const key = r.id + '|' + fmtDate(now) + '|' + r.time;
+    if (firedReminders[key]) return;
+    firedReminders[key] = true;
+    sfxNotif();
+    showNotif('⏰ ' + t('reminderDue'), r.title);
+    toast('🔔 ' + r.title, 'success');
+  });
+}
+setInterval(checkReminders, 30000);
+
+function checkEventReminders() {
+  const now = new Date();
+  const today = fmtDate(now);
+  events.forEach(e => {
+    if (!e.remind || !e.time) return;
+    if (e.date !== today) return;
+    const [h, m] = e.time.split(':').map(Number);
+    const evDate = new Date();
+    evDate.setHours(h, m, 0, 0);
+    const diff = (evDate - now) / 60000;
+    const key = 'ev|' + e.id + '|' + today;
+    if (diff > 0 && diff <= e.remind && !firedReminders[key]) {
+      firedReminders[key] = true;
+      sfxNotif();
+      showNotif('🔔 ' + t('eventSoon'), e.title);
+      toast('🔔 ' + e.title, 'success');
+    }
+  });
+}
+setInterval(checkEventReminders, 30000);
+
+function init() {
+  applyI18n();
+  applyTheme();
+  autoBackup();
+  render();
+  console.log('%c📝 Mozakker Ready', 'color:#4a6cf7;font-weight:bold;font-size:14px');
+}
+init();
+</script>
+<script>
+if ('serviceWorker' in navigator) {
+  window.addEventListener('load', () => {
+    navigator.serviceWorker.register('service-worker.js')
+      .then(() => console.log('✅ PWA شغال'))
+      .catch(err => console.log('❌ خطأ:', err));
+  });
+}
+</script>
+</body>
+</html>
